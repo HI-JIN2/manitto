@@ -1,11 +1,11 @@
 package party.manitto.domain.party
 
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import party.manitto.global.entity.Party
 
 @RestController
 @RequestMapping("/api/parties")
-@CrossOrigin(origins = ["http://localhost:*"])
 class PartyController(
     private val partyService: PartyService
 ) {
@@ -18,4 +18,10 @@ class PartyController(
 
     @GetMapping
     fun getAllParties(): List<Party> = partyService.getAllParties()
+
+    @GetMapping("/{partyId}/status")
+    fun getPartyStatus(@PathVariable partyId: Long): ResponseEntity<Map<String, Boolean>> {
+        val isMatched = partyService.isMatched(partyId)
+        return ResponseEntity.ok(mapOf("matched" to isMatched))
+    }
 }

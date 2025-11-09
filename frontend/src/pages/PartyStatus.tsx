@@ -5,25 +5,34 @@ function PartyStatus() {
   const [participants, setParticipants] = useState<{ id: number; email: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-  const partyId = 1; // 나중에 URL param으로 변경할 수 있음
+  const [isMatched, setIsMatched] = useState(false); // ✅ 매칭 상태 추가
+  const partyId = 1; // 나중에 URL param으로 변경 가능
 
-  // 참여자 목록 불러오기
+  // 참여자 목록 + 매칭 상태 동시에 불러오기
   useEffect(() => {
-    const fetchParticipants = async () => {
+    const fetchPartyData = async () => {
       try {
-        const res = await axios.get(
+        // 참여자 목록
+        const participantsRes = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/parties/${partyId}/participants`
         );
-        setParticipants(res.data);
+        setParticipants(participantsRes.data);
+
+        // 매칭 상태
+        const statusRes = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/parties/${partyId}/status`
+        );
+        setIsMatched(statusRes.data.matched);
       } catch (err) {
-        console.error("참여자 불러오기 실패:", err);
+        console.error("파티 정보 불러오기 실패:", err);
+        setMessage("파티 정보를 불러올 수 없습니다 😢");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchParticipants();
-  }, []);
+    fetchPartyData();
+  }, [partyId]);
 
   // 매칭 시작 요청
   const handleMatch = async () => {
@@ -32,6 +41,7 @@ function PartyStatus() {
         `${import.meta.env.VITE_API_BASE_URL}/parties/${partyId}/match`
       );
       setMessage("매칭 완료! 이메일이 발송되었습니다 ✉️");
+      setIsMatched(true); // ✅ UI 상태 업데이트
       console.log(res.data);
     } catch (err) {
       console.error("매칭 중 오류:", err);
@@ -54,20 +64,27 @@ function PartyStatus() {
         </ul>
       )}
 
-      <button
-        onClick={handleMatch}
-        style={{
-          marginTop: 20,
-          padding: "10px 20px",
-          borderRadius: 10,
-          backgroundColor: "#0078FF",
-          color: "white",
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        매칭 시작 🎁
-      </button>
+      {/* ✅ 매칭 상태에 따른 UI 분기 */}
+      {isMatched ? (
+        <div style={{ marginTop: 20, color: "green", fontWeight: "bold" }}>
+          🎁 이미 매칭이 완료된 파티입니다!
+        </div>
+      ) : (
+        <button
+          onClick={handleMatch}
+          style={{
+            marginTop: 20,
+            padding: "10px 20px",
+            borderRadius: 10,
+            backgroundColor: "#0078FF",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          매칭 시작 🎁
+        </button>
+      )}
 
       {message && <p style={{ marginTop: 20 }}>{message}</p>}
     </div>
