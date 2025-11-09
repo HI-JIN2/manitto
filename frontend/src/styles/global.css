@@ -1,0 +1,10 @@
+body {
+  font-family: 'Pretendard', sans-serif;
+  background: #f8f9fa;
+  color: #222;
+  margin: 0;
+}
+input, button {
+  padding: 8px;
+  margin: 4px;
+}
