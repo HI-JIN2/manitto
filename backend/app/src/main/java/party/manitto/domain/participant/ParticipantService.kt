@@ -13,9 +13,15 @@ class ParticipantService(
         val party = partyRepository.findById(partyId)
             .orElseThrow { IllegalArgumentException("파티가 존재하지 않습니다.") }
 
+        val existing = participantRepository.findByPartyIdAndEmail(partyId, email)
+        if (existing != null) {
+            throw IllegalArgumentException("이미 이 파티에 등록된 이메일입니다.")
+        }
+
         val participant = participantRepository.save(Participant(email = email, party = party))
         return ParticipantResponse(id = participant.id, email = participant.email)
     }
+
 
     fun getParticipants(partyId: Long): List<ParticipantResponse> {
         return participantRepository.findByPartyId(partyId)
