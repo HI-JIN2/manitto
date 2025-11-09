@@ -15,7 +15,12 @@ class ParticipantController(
     fun joinParty(
         @PathVariable partyId: Long,
         @RequestBody req: JoinRequest
-    ): Participant {
+    ): ParticipantResponse {
         return participantService.joinParty(partyId, req.email)
+    }
+
+    @GetMapping("/{partyId}/participants")
+    fun getParticipants(@PathVariable partyId: Long): List<ParticipantResponse> {
+        return participantService.getParticipants(partyId)
     }
 }
