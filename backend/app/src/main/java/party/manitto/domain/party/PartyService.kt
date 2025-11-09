@@ -1,6 +1,7 @@
-package party.manitto.party
+package party.manitto.domain.party
 
 import org.springframework.stereotype.Service
+import party.manitto.global.entity.Party
 
 @Service
 class PartyService(

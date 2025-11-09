@@ -1,10 +1,11 @@
-package party.manitto.party
+package party.manitto.domain.party
 
 import org.springframework.web.bind.annotation.*
+import party.manitto.global.entity.Party
 
 @RestController
 @RequestMapping("/api/parties")
-@CrossOrigin(origins = ["http://localhost:5173"])
+@CrossOrigin(origins = ["http://localhost:*"])
 class PartyController(
     private val partyService: PartyService
 ) {
