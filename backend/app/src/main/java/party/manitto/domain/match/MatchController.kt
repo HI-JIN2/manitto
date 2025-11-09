@@ -10,12 +10,6 @@ class MatchController(
 ) {
     @PostMapping("/{partyId}/match")
     fun matchAndNotify(@PathVariable partyId: Long): String {
-        val pairs = matchService.matchParticipants(partyId)
-
-        pairs.forEach { (giver, receiver) ->
-            mailService.sendMatchEmail(giver.email, receiver.email)
-        }
-
-        return "매칭 완료! 이메일 발송됨."
+        return matchService.matchAndSave(partyId)
     }
 }
