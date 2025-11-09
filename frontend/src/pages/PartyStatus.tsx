@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useParams } from "react-router-dom";
 
 function PartyStatus() {
   const [participants, setParticipants] = useState<{ id: number; email: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-  const [isMatched, setIsMatched] = useState(false); // ✅ 매칭 상태 추가
-  const partyId = 1; // 나중에 URL param으로 변경 가능
+  const [isMatched, setIsMatched] = useState(false); 
+  const { partyId } = useParams();
 
   // 참여자 목록 + 매칭 상태 동시에 불러오기
   useEffect(() => {

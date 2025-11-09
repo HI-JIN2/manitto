@@ -1,10 +1,12 @@
 import { useState } from "react";
 import api from "../api/partyApi";
 import axios from "axios"; 
-
+  import { useParams } from "react-router-dom";
 
 export default function JoinParty() {
-  const [partyId, setPartyId] = useState("");
+  // const [partyId, setPartyId] = useState("");
+
+  const { partyId } = useParams();
   const [email, setEmail] = useState("");
 
 const handleJoin = async (e: React.FormEvent) => {
@@ -27,11 +29,11 @@ const handleJoin = async (e: React.FormEvent) => {
     <div style={{ padding: 20 }}>
       <h2>🔑 마니또 방 참여</h2>
       <form onSubmit={handleJoin}>
-        <input
+        {/* <input
           placeholder="파티 ID"
           value={partyId}
           onChange={(e) => setPartyId(e.target.value)}
-        />
+        /> */}
         <input
           placeholder="이메일"
           value={email}
