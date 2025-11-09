@@ -1,12 +1,22 @@
 import { useState } from "react";
+import api from "../api/partyApi";
 
 export default function CreateParty() {
   const [partyName, setPartyName] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`방 생성: ${partyName} / 비번: ${password}`);
+    try {
+      const res = await api.post("/parties", {
+        name: partyName,
+        password,
+      });
+      alert(`파티 생성 완료! ID: ${res.data.id}`);
+    } catch (error) {
+      console.error(error);
+      alert("파티 생성 실패 😢");
+    }
   };
 
   return (
