@@ -23,6 +23,18 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 
+    // google oauth
+    implementation("com.google.api-client:google-api-client:2.4.0")
+    implementation("com.google.http-client:google-http-client-jackson2:1.43.3")
+
+    // jwt
+    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+    implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
+    implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
+
+    // security
+    implementation("org.springframework.boot:spring-boot-starter-security")
+
 }
 
 tasks.withType<Test> {
