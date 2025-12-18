@@ -1,0 +1,31 @@
+jwt:
+  secret: 1ed9e4e637cef80e7f5e21d5f28c9853b2aee451f5da1f8a2a1aacf2602c34d7
+google:
+  client-id: 772988401705-4io9tviphr75k075kb9lbrnmn960h2r8.apps.googleusercontent.com
+spring:
+  doc:
+    api-docs:
+      path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+  datasource:
+    url: jdbc:postgresql://localhost:5432/manitto
+    username: postgres
+    password: word1234
+  jpa:
+    hibernate:
+      ddl-auto:  create  #update  create-drop
+    show-sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: hi.urssu@gmail.com
+    password: anki dsjw nmes cieq
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+server:
+  port: 8080

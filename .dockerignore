@@ -1,0 +1,15 @@
+# Build outputs
+build/
+app/build/
+.gradle/
+
+# IDE
+.idea/
+*.iml
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
