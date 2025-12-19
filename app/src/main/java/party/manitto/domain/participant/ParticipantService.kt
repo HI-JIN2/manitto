@@ -1,20 +1,40 @@
 package party.manitto.domain.participant
 
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import party.manitto.domain.match.MatchedResultRepository
 import party.manitto.global.entity.Participant
+import party.manitto.global.entity.Party
 import party.manitto.global.entity.User
 import party.manitto.domain.party.PartyRepository
 
 @Service
 class ParticipantService(
     private val participantRepository: ParticipantRepository,
-    private val partyRepository: PartyRepository
+    private val partyRepository: PartyRepository,
+    private val matchedResultRepository: MatchedResultRepository
 ) {
-    fun joinParty(partyId: Long, user: User, nickname: String? = null): ParticipantResponse {
+    @Transactional
+    fun joinPartyById(partyId: Long, user: User, nickname: String? = null): ParticipantResponse {
         val party = partyRepository.findById(partyId)
             .orElseThrow { IllegalArgumentException("파티가 존재하지 않습니다.") }
+        return joinParty(party, user, nickname)
+    }
 
-        val existing = participantRepository.findByPartyIdAndUser(partyId, user)
+    @Transactional
+    fun joinPartyByInviteCode(inviteCode: String, user: User, nickname: String? = null): ParticipantResponse {
+        val party = partyRepository.findByInviteCode(inviteCode)
+            ?: throw IllegalArgumentException("유효하지 않은 초대 코드입니다.")
+        return joinParty(party, user, nickname)
+    }
+
+    private fun joinParty(party: Party, user: User, nickname: String?): ParticipantResponse {
+        // 이미 매칭된 파티에는 참가 불가
+        if (matchedResultRepository.existsByParty(party)) {
+            throw IllegalArgumentException("이미 매칭이 완료된 파티에는 참가할 수 없습니다.")
+        }
+
+        val existing = participantRepository.findByPartyIdAndUser(party.id, user)
         if (existing != null) {
             throw IllegalArgumentException("이미 이 파티에 참가한 사용자입니다.")
         }
