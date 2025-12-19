@@ -7,7 +7,10 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
+import java.time.LocalDateTime
 
 @Entity
 data class Party(
@@ -17,10 +20,26 @@ data class Party(
     @Column(nullable = false)
     val name: String,
 
+    @Column(nullable = false, unique = true, length = 6)
+    val inviteCode: String,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "host_id", nullable = false)
+    val host: User,
+
     @Column(nullable = false)
-    val password: String,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
 
     @OneToMany(mappedBy = "party", cascade = [CascadeType.ALL], orphanRemoval = true)
     val participants: MutableList<Participant> = mutableListOf()
-
-)
+) {
+    companion object {
+        private val CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789" // 혼동되는 문자 제외 (0,O,1,I)
+        
+        fun generateInviteCode(): String {
+            return (1..6)
+                .map { CHARS.random() }
+                .joinToString("")
+        }
+    }
+}
