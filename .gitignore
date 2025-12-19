@@ -1,8 +1,6 @@
 # Gradle
 .gradle/
 build/
-!gradle/wrapper/gradle-wrapper.jar
-!gradle/wrapper/gradle-wrapper.properties
 
 # IDE
 .idea/
@@ -11,9 +9,8 @@ build/
 *.iws
 out/
 
-# Kotlin
+# Build artifacts
 *.class
-*.log
 *.jar
 *.war
 *.nar
@@ -21,6 +18,10 @@ out/
 *.zip
 *.tar.gz
 *.rar
+
+# Gradle Wrapper (예외 - 반드시 *.jar 뒤에 와야 함)
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
 
 # OS
 .DS_Store
