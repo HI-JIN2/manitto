@@ -1,0 +1,22 @@
+version: '3.8'
+
+# 로컬 개발용 - PostgreSQL만 Docker로 실행
+# 사용법: docker-compose -f docker-compose.local.yml up -d
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: manitto-local-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: manitto
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_local_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_local_data:
+

@@ -54,9 +54,9 @@ jobs:
           script: |
             cd /opt/manitto-backend
             
-            # 환경변수 파일 생성
+            # 환경변수 파일 생성 (NCP RDS 사용)
             cat > .env << 'EOF'
-            DB_NAME=${{ secrets.DB_NAME }}
+            DB_URL=${{ secrets.DB_URL }}
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
