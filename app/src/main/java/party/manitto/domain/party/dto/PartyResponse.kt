@@ -1,4 +1,4 @@
-package party.manitto.domain.party
+package party.manitto.domain.party.dto
 
 import party.manitto.global.entity.Party
 import java.time.LocalDateTime

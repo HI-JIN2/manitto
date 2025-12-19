@@ -1,10 +1,13 @@
 package party.manitto.domain.match
 
+import party.manitto.domain.match.dto.MatchResultResponse
+import party.manitto.domain.match.dto.MyMatchResponse
 import party.manitto.domain.participant.ParticipantRepository
+import party.manitto.global.entity.MatchedResult
 import party.manitto.global.entity.Participant
+import party.manitto.global.entity.User
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import party.manitto.global.entity.MatchedResult
 import kotlin.random.Random
 
 @Service
@@ -14,7 +17,7 @@ class MatchService(
     private val mailService: MailService
 ) {
     @Transactional
-    fun matchAndSave(partyId: Long): String {
+    fun matchAndSave(partyId: Long): MatchResultResponse {
         val participants = participantRepository.findByPartyId(partyId)
         require(participants.size > 1) { "참여자가 2명 이상이어야 합니다." }
 
@@ -33,6 +36,16 @@ class MatchService(
             mailService.sendMatchEmail(it.giver.email, it.receiver.email)
         }
 
-        return "매칭 완료 및 이메일 발송 성공!"
+        return MatchResultResponse(message = "매칭 완료 및 이메일 발송 성공!")
+    }
+    
+    fun getMyMatch(partyId: Long, user: User): MyMatchResponse {
+        val participant = participantRepository.findByPartyIdAndUser(partyId, user)
+            ?: throw IllegalArgumentException("해당 파티에 참가하지 않았습니다.")
+        
+        val matchResult = matchedResultRepository.findByGiver(participant)
+            ?: throw IllegalArgumentException("아직 매칭이 완료되지 않았습니다.")
+        
+        return MyMatchResponse(receiver = matchResult.receiver.displayName)
     }
 }

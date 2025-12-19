@@ -2,6 +2,8 @@ package party.manitto.domain.participant
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import party.manitto.domain.participant.dto.JoinPartyRequest
+import party.manitto.domain.participant.dto.ParticipantResponse
 import party.manitto.global.entity.User
 
 @RestController
@@ -9,13 +11,11 @@ import party.manitto.global.entity.User
 class ParticipantController(
     private val participantService: ParticipantService
 ) {
-    data class JoinRequest(val nickname: String? = null)
-
     // 파티 ID로 참가 (내부 용도)
     @PostMapping("/{partyId}/join")
     fun joinPartyById(
         @PathVariable partyId: Long,
-        @RequestBody(required = false) req: JoinRequest?,
+        @RequestBody(required = false) req: JoinPartyRequest?,
         @AuthenticationPrincipal user: User
     ): ParticipantResponse {
         return participantService.joinPartyById(partyId, user, req?.nickname)
@@ -25,7 +25,7 @@ class ParticipantController(
     @PostMapping("/invite/{inviteCode}/join")
     fun joinPartyByInviteCode(
         @PathVariable inviteCode: String,
-        @RequestBody(required = false) req: JoinRequest?,
+        @RequestBody(required = false) req: JoinPartyRequest?,
         @AuthenticationPrincipal user: User
     ): ParticipantResponse {
         return participantService.joinPartyByInviteCode(inviteCode, user, req?.nickname)

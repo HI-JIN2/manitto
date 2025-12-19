@@ -1,4 +1,4 @@
-package party.manitto.domain.participant
+package party.manitto.domain.participant.dto
 
 import party.manitto.global.entity.Participant
 
@@ -21,3 +21,4 @@ data class ParticipantResponse(
         }
     }
 }
+

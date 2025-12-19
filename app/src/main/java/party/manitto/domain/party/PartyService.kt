@@ -3,6 +3,7 @@ package party.manitto.domain.party
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import party.manitto.domain.match.MatchedResultRepository
+import party.manitto.domain.party.dto.PartyResponse
 import party.manitto.global.entity.Party
 import party.manitto.global.entity.User
 
