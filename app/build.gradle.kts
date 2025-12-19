@@ -8,7 +8,15 @@ plugins {
 
 group = "com.manitto"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_17
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+kotlin {
+    jvmToolchain(17)
+}
 
 repositories {
     mavenCentral()
@@ -22,6 +30,9 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+    
+    // .env 파일 자동 로드
+    implementation("me.paulschwarz:spring-dotenv:4.0.0")
 
     // google oauth
     implementation("com.google.api-client:google-api-client:2.4.0")

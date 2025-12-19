@@ -1,8 +1,8 @@
 jwt:
-  secret: ${JWT_SECRET:1ed9e4e637cef80e7f5e21d5f28c9853b2aee451f5da1f8a2a1aacf2602c34d7}
+  secret: ${JWT_SECRET}
 
 google:
-  client-id: ${GOOGLE_CLIENT_ID:772988401705-4io9tviphr75k075kb9lbrnmn960h2r8.apps.googleusercontent.com}
+  client-id: ${GOOGLE_CLIENT_ID}
 
 spring:
   doc:
@@ -11,18 +11,18 @@ spring:
   swagger-ui:
     path: /swagger-ui.html
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/manitto}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:word1234}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
-    show-sql: ${SPRING_JPA_SHOW_SQL:true}
+    show-sql: ${SPRING_JPA_SHOW_SQL:false}
   mail:
     host: ${SPRING_MAIL_HOST:smtp.gmail.com}
     port: ${SPRING_MAIL_PORT:587}
-    username: ${SPRING_MAIL_USERNAME:hi.urssu@gmail.com}
-    password: ${SPRING_MAIL_PASSWORD:anki dsjw nmes cieq}
+    username: ${SPRING_MAIL_USERNAME}
+    password: ${SPRING_MAIL_PASSWORD}
     properties:
       mail:
         smtp:
