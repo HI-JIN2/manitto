@@ -50,6 +50,7 @@ jobs:
           port: ${{ secrets.NCP_PORT }}
           source: "image.tar.gz,docker-compose.yml"
           target: "/opt/manitto-backend"
+          debug: true
 
       - name: Deploy to NCP Server
         uses: appleboy/ssh-action@v1.0.3
@@ -58,6 +59,7 @@ jobs:
           username: ${{ secrets.NCP_USERNAME }}
           key: ${{ secrets.NCP_SSH_KEY }}
           port: ${{ secrets.NCP_PORT }}
+          debug: true
           script: |
             cd /opt/manitto-backend
             
