@@ -78,9 +78,10 @@ jobs:
             gunzip -c image.tar.gz | docker load
             
             # docker-compose.yml에서 빌드 설정을 이미지로 변경
-            sed -i 's|build:|image: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}\\n    #build:|g' docker-compose.yml
+            sed -i 's|build:|image: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}|g' docker-compose.yml
             sed -i '/context:/d' docker-compose.yml
             sed -i '/dockerfile:/d' docker-compose.yml
+            sed -i '/Dockerfile/d' docker-compose.yml
             
             # 기존 컨테이너 정지 및 새 컨테이너 실행
             docker-compose down || true
