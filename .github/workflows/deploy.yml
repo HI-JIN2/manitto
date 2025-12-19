@@ -41,29 +41,27 @@ jobs:
       - name: Save Docker Image
         run: docker save ${{ env.DOCKER_IMAGE }}:${{ github.sha }} | gzip > image.tar.gz
 
-      - name: Copy to NCP Server
+      - name: Copy files to NCP Server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.NCP_HOST }}
           username: ${{ secrets.NCP_USERNAME }}
-          key: ${{ secrets.NCP_SSH_KEY }}
+          password: ${{ secrets.NCP_PASSWORD }}
           port: ${{ secrets.NCP_PORT }}
           source: "image.tar.gz,docker-compose.yml"
           target: "/opt/manitto-backend"
-          debug: true
 
       - name: Deploy to NCP Server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.NCP_HOST }}
           username: ${{ secrets.NCP_USERNAME }}
-          key: ${{ secrets.NCP_SSH_KEY }}
+          password: ${{ secrets.NCP_PASSWORD }}
           port: ${{ secrets.NCP_PORT }}
-          debug: true
           script: |
             cd /opt/manitto-backend
             
-            # 환경변수 파일 생성 (NCP RDS 사용)
+            # 환경변수 파일 생성
             cat > .env << 'EOF'
             DB_URL=${{ secrets.DB_URL }}
             DB_USER=${{ secrets.DB_USER }}
@@ -79,18 +77,15 @@ jobs:
             # Docker 이미지 로드
             gunzip -c image.tar.gz | docker load
             
-            # 기존 컨테이너 정지 및 제거
-            docker-compose down || true
-            
-            # docker-compose.yml에서 이미지 태그 업데이트
-            sed -i 's|build:.*|image: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}|g' docker-compose.yml
+            # docker-compose.yml에서 빌드 설정을 이미지로 변경
+            sed -i 's|build:|image: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}\\n    #build:|g' docker-compose.yml
             sed -i '/context:/d' docker-compose.yml
             sed -i '/dockerfile:/d' docker-compose.yml
             
-            # 새 컨테이너 실행
+            # 기존 컨테이너 정지 및 새 컨테이너 실행
+            docker-compose down || true
             docker-compose up -d
             
             # 정리
             rm -f image.tar.gz
             docker image prune -f
-
