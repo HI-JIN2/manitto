@@ -2,6 +2,7 @@ package party.manitto.domain.participant
 
 import org.springframework.stereotype.Service
 import party.manitto.global.entity.Participant
+import party.manitto.global.entity.User
 import party.manitto.domain.party.PartyRepository
 
 @Service
@@ -9,22 +10,28 @@ class ParticipantService(
     private val participantRepository: ParticipantRepository,
     private val partyRepository: PartyRepository
 ) {
-    fun joinParty(partyId: Long, email: String): ParticipantResponse {
+    fun joinParty(partyId: Long, user: User, nickname: String? = null): ParticipantResponse {
         val party = partyRepository.findById(partyId)
             .orElseThrow { IllegalArgumentException("파티가 존재하지 않습니다.") }
 
-        val existing = participantRepository.findByPartyIdAndEmail(partyId, email)
+        val existing = participantRepository.findByPartyIdAndUser(partyId, user)
         if (existing != null) {
-            throw IllegalArgumentException("이미 이 파티에 등록된 이메일입니다.")
+            throw IllegalArgumentException("이미 이 파티에 참가한 사용자입니다.")
         }
 
-        val participant = participantRepository.save(Participant(email = email, party = party))
-        return ParticipantResponse(id = participant.id, email = participant.email)
+        val participant = participantRepository.save(
+            Participant(user = user, party = party, nickname = nickname)
+        )
+        return ParticipantResponse.from(participant)
     }
-
 
     fun getParticipants(partyId: Long): List<ParticipantResponse> {
         return participantRepository.findByPartyId(partyId)
-            .map { ParticipantResponse(id = it.id, email = it.email) }
+            .map { ParticipantResponse.from(it) }
+    }
+
+    fun getMyParties(user: User): List<ParticipantResponse> {
+        return participantRepository.findByUser(user)
+            .map { ParticipantResponse.from(it) }
     }
 }
