@@ -35,7 +35,7 @@ class PartyService(
     }
 
     fun getPartyByInviteCode(inviteCode: String): PartyResponse {
-        val party = partyRepository.findByInviteCode(inviteCode.uppercase())
+        val party = partyRepository.findByInviteCode(inviteCode)
             ?: throw IllegalArgumentException("유효하지 않은 초대 코드입니다.")
         return PartyResponse.from(party)
     }

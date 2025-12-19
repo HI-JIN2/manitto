@@ -34,7 +34,8 @@ data class Party(
     val participants: MutableList<Participant> = mutableListOf()
 ) {
     companion object {
-        private val CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789" // 혼동되는 문자 제외 (0,O,1,I)
+        // 혼동되는 문자 제외 (0,O,o,1,I,i,l,L)
+        private val CHARS = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789"
         
         fun generateInviteCode(): String {
             return (1..6)
