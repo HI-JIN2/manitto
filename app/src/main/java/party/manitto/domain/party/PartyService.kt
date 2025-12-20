@@ -39,8 +39,15 @@ class PartyService(
             guestEmail = hostEmail
         )
         participantRepository.save(hostParticipant)
-        
-        return PartyResponse.from(saved)
+
+        // participants 컬렉션에 직접 추가 (JPA 관계 동기화)
+        saved.participants.add(hostParticipant)
+
+        // 저장된 파티를 다시 조회하여 participants 컬렉션을 로드
+        val partyWithParticipants = partyRepository.findById(saved.id)
+            .orElseThrow { IllegalStateException("Party not found after creation") }
+
+        return PartyResponse.from(partyWithParticipants)
     }
 
     private fun generateUniqueInviteCode(): String {

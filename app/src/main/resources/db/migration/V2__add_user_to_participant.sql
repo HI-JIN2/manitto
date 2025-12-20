@@ -29,8 +29,8 @@ FROM users u
 WHERE p.email = u.email
   AND p.user_id IS NULL;
 
--- 6. user_id를 NOT NULL로 변경
-ALTER TABLE participant ALTER COLUMN user_id SET NOT NULL;
+-- 6. user_id는 nullable로 유지 (게스트 모드 지원)
+-- ALTER TABLE participant ALTER COLUMN user_id SET NOT NULL; -- 게스트 모드를 위해 제거
 
 -- 7. Foreign Key 추가
 ALTER TABLE participant 
