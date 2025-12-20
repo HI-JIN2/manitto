@@ -4,6 +4,9 @@ jwt:
 google:
   client-id: ${GOOGLE_CLIENT_ID}
 
+kakao:
+  rest-api-key: ${KAKAO_REST_API_KEY}
+
 spring:
   doc:
     api-docs:

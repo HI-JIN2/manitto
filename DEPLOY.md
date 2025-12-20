@@ -50,7 +50,7 @@ JWT_SECRET=생성된_시크릿_키        # openssl rand -hex 32
 GOOGLE_CLIENT_ID=your_client_id.apps.googleusercontent.com
 MAIL_USERNAME=your_email@gmail.com
 MAIL_PASSWORD=your_app_password
-DDL_AUTO=update
+DDL_AUTO=validate
 SHOW_SQL=false
 ```
 

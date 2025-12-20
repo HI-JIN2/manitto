@@ -70,7 +70,7 @@ jobs:
             GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
             MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
             MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
-            DDL_AUTO=update
+            DDL_AUTO=validate
             SHOW_SQL=false
             EOF
             
