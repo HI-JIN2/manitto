@@ -10,7 +10,8 @@ import party.manitto.global.entity.User
 @Service
 class PartyService(
     private val partyRepository: PartyRepository,
-    private val matchedResultRepository: MatchedResultRepository
+    private val matchedResultRepository: MatchedResultRepository,
+    private val participantRepository: ParticipantRepository
 ) {
 
     @Transactional
@@ -18,6 +19,25 @@ class PartyService(
         val inviteCode = generateUniqueInviteCode()
         val newParty = Party(name = name, inviteCode = inviteCode, host = host)
         val saved = partyRepository.save(newParty)
+        return PartyResponse.from(saved)
+    }
+
+    @Transactional
+    fun createGuestParty(name: String, hostName: String, hostEmail: String): PartyResponse {
+        val inviteCode = generateUniqueInviteCode()
+        val newParty = Party(name = name, inviteCode = inviteCode, host = null)
+        val saved = partyRepository.save(newParty)
+        
+        // 게스트 호스트를 첫 번째 참가자로 추가
+        val hostParticipant = Participant(
+            user = null,
+            party = saved,
+            nickname = null,
+            guestName = hostName,
+            guestEmail = hostEmail
+        )
+        participantRepository.save(hostParticipant)
+        
         return PartyResponse.from(saved)
     }
 
@@ -54,6 +74,6 @@ class PartyService(
     fun isHost(partyId: Long, user: User): Boolean {
         val party = partyRepository.findById(partyId)
             .orElseThrow { IllegalArgumentException("해당 파티가 존재하지 않습니다.") }
-        return party.host.id == user.id
+        return party.host?.id == user.id
     }
 }

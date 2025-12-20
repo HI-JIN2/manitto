@@ -39,4 +39,10 @@ class PartyController(
         val isMatched = partyService.isMatched(partyId)
         return PartyStatusResponse(matched = isMatched)
     }
+
+    // 게스트 모드: 로그인 없이 파티 생성
+    @PostMapping("/guest")
+    fun createGuestParty(@RequestBody req: GuestCreatePartyRequest): PartyResponse {
+        return partyService.createGuestParty(req.name, req.hostName, req.hostEmail)
+    }
 }

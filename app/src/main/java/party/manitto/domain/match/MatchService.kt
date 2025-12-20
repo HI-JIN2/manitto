@@ -32,8 +32,13 @@ class MatchService(
 
         matchedResultRepository.saveAll(results)
 
+        // 파티 이름 가져오기
+        val party = participants.firstOrNull()?.party
+        val partyName = party?.name
+
+        // 매칭 결과 이메일 발송
         results.forEach {
-            mailService.sendMatchEmail(it.giver.email, it.receiver.email)
+            mailService.sendMatchEmail(it.giver.email, it.receiver.displayName, partyName)
         }
 
         return MatchResultResponse(message = "매칭 완료 및 이메일 발송 성공!")

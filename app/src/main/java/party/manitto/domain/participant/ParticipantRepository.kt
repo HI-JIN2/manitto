@@ -19,4 +19,10 @@ interface ParticipantRepository : JpaRepository<Participant, Long> {
 
     @Query("SELECT p FROM Participant p WHERE p.user = :user")
     fun findByUser(@Param("user") user: User): List<Participant>
+
+    @Query("SELECT p FROM Participant p WHERE p.party.id = :partyId AND p.guestEmail = :email AND p.user IS NULL")
+    fun findByPartyIdAndGuestEmail(
+        @Param("partyId") partyId: Long,
+        @Param("email") email: String
+    ): Participant?
 }

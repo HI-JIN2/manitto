@@ -2,6 +2,7 @@ package party.manitto.domain.participant
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import party.manitto.domain.participant.dto.GuestJoinPartyRequest
 import party.manitto.domain.participant.dto.JoinPartyRequest
 import party.manitto.domain.participant.dto.ParticipantResponse
 import party.manitto.global.entity.User
@@ -39,5 +40,22 @@ class ParticipantController(
     @GetMapping("/me")
     fun getMyParties(@AuthenticationPrincipal user: User): List<ParticipantResponse> {
         return participantService.getMyParties(user)
+    }
+
+    // 게스트 모드: 로그인 없이 파티 참가
+    @PostMapping("/{partyId}/guest/join")
+    fun joinPartyAsGuest(
+        @PathVariable partyId: Long,
+        @RequestBody req: GuestJoinPartyRequest
+    ): ParticipantResponse {
+        return participantService.joinPartyAsGuest(partyId, req.name, req.email, req.nickname)
+    }
+
+    @PostMapping("/invite/{inviteCode}/guest/join")
+    fun joinPartyAsGuestByInviteCode(
+        @PathVariable inviteCode: String,
+        @RequestBody req: GuestJoinPartyRequest
+    ): ParticipantResponse {
+        return participantService.joinPartyAsGuestByInviteCode(inviteCode, req.name, req.email, req.nickname)
     }
 }
