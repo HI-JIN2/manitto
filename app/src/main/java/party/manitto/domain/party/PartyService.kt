@@ -6,6 +6,7 @@ import party.manitto.domain.match.MatchedResultRepository
 import party.manitto.domain.participant.ParticipantRepository
 import party.manitto.domain.party.dto.GuestParticipantRequest
 import party.manitto.domain.party.dto.PartyResponse
+import party.manitto.domain.party.dto.PartyStatsResponse
 import party.manitto.global.entity.Participant
 import party.manitto.global.entity.Party
 import party.manitto.global.entity.User
@@ -109,5 +110,14 @@ class PartyService(
         val party = partyRepository.findById(partyId)
             .orElseThrow { IllegalArgumentException("해당 파티가 존재하지 않습니다.") }
         return party.host?.id == user.id
+    }
+
+    fun getStats(): PartyStatsResponse {
+        val partyCount = partyRepository.count()
+        val participantCount = participantRepository.count()
+        return PartyStatsResponse(
+            partyCount = partyCount,
+            participantCount = participantCount
+        )
     }
 }
