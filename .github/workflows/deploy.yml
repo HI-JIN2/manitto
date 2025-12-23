@@ -72,6 +72,7 @@ jobs:
             MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
             DDL_AUTO=validate
             SHOW_SQL=false
+            SPRING_PROFILES_ACTIVE=prod
             EOF
             
             # Docker 이미지 로드
