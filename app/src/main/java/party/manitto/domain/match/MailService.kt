@@ -30,6 +30,8 @@ class MailService(
             appendLine("마니또 파티 서비스에 회원 가입해 보세요.")
             appendLine("앞으로는 참여 이력을 계정에서 편하게 확인할 수 있어요.")
             appendLine()
+            appendLine("서비스 바로가기: https://manitto-frontend.vercel.app/")
+            appendLine()
             appendLine("그럼, 즐거운 마니또 파티 되세요 💝")
             appendLine()
             appendLine("— 마니또 파티 팀 드림")
