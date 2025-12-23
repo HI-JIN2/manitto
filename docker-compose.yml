@@ -14,12 +14,14 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       # JPA
-      SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-update}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-validate}
       SPRING_JPA_SHOW_SQL: ${SHOW_SQL:-false}
       # JWT
       JWT_SECRET: ${JWT_SECRET}
       # Google OAuth
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      # Kakao OAuth
+      KAKAO_REST_API_KEY: ${KAKAO_REST_API_KEY}
       # Mail
       SPRING_MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
       SPRING_MAIL_PORT: ${MAIL_PORT:-587}

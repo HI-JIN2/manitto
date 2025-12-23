@@ -3,6 +3,7 @@ package party.manitto.domain.party
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import party.manitto.domain.party.dto.*
 import party.manitto.global.entity.User
 
 @RestController
@@ -10,8 +11,6 @@ import party.manitto.global.entity.User
 class PartyController(
     private val partyService: PartyService
 ) {
-    data class CreatePartyRequest(val name: String)
-
     @PostMapping
     fun createParty(
         @RequestBody req: CreatePartyRequest,
@@ -36,8 +35,14 @@ class PartyController(
     }
 
     @GetMapping("/{partyId}/status")
-    fun getPartyStatus(@PathVariable partyId: Long): ResponseEntity<Map<String, Boolean>> {
+    fun getPartyStatus(@PathVariable partyId: Long): PartyStatusResponse {
         val isMatched = partyService.isMatched(partyId)
-        return ResponseEntity.ok(mapOf("matched" to isMatched))
+        return PartyStatusResponse(matched = isMatched)
+    }
+
+    // 게스트 모드: 로그인 없이 파티 생성
+    @PostMapping("/guest")
+    fun createGuestParty(@RequestBody req: GuestCreatePartyRequest): PartyResponse {
+        return partyService.createGuestParty(req.name, req.hostName, req.hostEmail)
     }
 }

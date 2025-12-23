@@ -24,8 +24,8 @@ data class Party(
     val inviteCode: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "host_id", nullable = false)
-    val host: User,
+    @JoinColumn(name = "host_id", nullable = true)
+    val host: User? = null, // 게스트 모드를 위해 nullable
 
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),

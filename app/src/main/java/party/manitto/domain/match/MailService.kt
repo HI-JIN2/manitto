@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service
 class MailService(
     private val mailSender: JavaMailSender
 ) {
-    fun sendMatchEmail(to: String, target: String) {
+    fun sendMatchEmail(to: String, target: String, partyName: String? = null) {
         val message = SimpleMailMessage()
         message.setTo(to)
-        message.subject = "[마니또] 당신의 마니또가 정해졌습니다 🎁"
-        message.text = "안녕하세요! 당신의 마니또는 ${target} 입니다."
+        message.subject = "[Manitto] Your Manitto has been assigned! 🎁"
+        val partyInfo = if (partyName != null) "\n\nParty: $partyName" else ""
+        message.text = "Hello! Your Manitto is ${target}.${partyInfo}\n\nPlease prepare a thoughtful gift! 💝"
         mailSender.send(message)
-
     }
 }

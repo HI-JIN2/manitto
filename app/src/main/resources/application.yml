@@ -4,6 +4,9 @@ jwt:
 google:
   client-id: ${GOOGLE_CLIENT_ID}
 
+kakao:
+  rest-api-key: ${KAKAO_REST_API_KEY}
+
 spring:
   doc:
     api-docs:
@@ -16,8 +19,13 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:}}
   jpa:
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:${DDL_AUTO:update}}
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:${DDL_AUTO:validate}}
     show-sql: ${SPRING_JPA_SHOW_SQL:${SHOW_SQL:false}}
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true}
+    baseline-on-migrate: ${FLYWAY_BASELINE_ON_MIGRATE:true}
+    baseline-version: ${FLYWAY_BASELINE_VERSION:0}
+    locations: classpath:db/migration
   mail:
     host: ${SPRING_MAIL_HOST:${MAIL_HOST:smtp.gmail.com}}
     port: ${SPRING_MAIL_PORT:${MAIL_PORT:587}}
