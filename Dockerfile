@@ -7,13 +7,18 @@ COPY settings.gradle.kts .
 COPY gradle.properties .
 COPY gradle ./gradle
 COPY gradlew .
+RUN chmod +x gradlew
 COPY app/build.gradle.kts ./app/
+
+# Download dependencies (cached layer)
+COPY app/src/main/resources ./app/src/main/resources
+RUN ./gradlew :app:dependencies --no-daemon || true
 
 # Copy source code
 COPY app/src ./app/src
 
 # Build the application
-RUN chmod +x gradlew && ./gradlew :app:bootJar --no-daemon
+RUN ./gradlew :app:bootJar --no-daemon --parallel --build-cache
 
 # Runtime stage
 FROM eclipse-temurin:17-jre-alpine

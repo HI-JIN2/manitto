@@ -27,19 +27,26 @@ jobs:
         with:
           cache-read-only: false
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
       - name: Build with Gradle
-        run: ./gradlew :app:bootJar --no-daemon
+        run: ./gradlew :app:bootJar --parallel --build-cache --no-daemon
         env:
-          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true"
+          GRADLE_OPTS: "-Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.configureondemand=true"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Build Docker Image
-        run: docker build -t ${{ env.DOCKER_IMAGE }}:${{ github.sha }} .
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
 
-      - name: Save Docker Image
-        run: docker save ${{ env.DOCKER_IMAGE }}:${{ github.sha }} | gzip > image.tar.gz
+      - name: Save Docker Image (compressed)
+        run: docker save ${{ env.DOCKER_IMAGE }}:${{ github.sha }} | gzip -1 > image.tar.gz
 
       - name: Copy files to NCP Server
         uses: appleboy/scp-action@v0.1.7
@@ -50,6 +57,7 @@ jobs:
           port: ${{ secrets.NCP_PORT }}
           source: "image.tar.gz,docker-compose.yml"
           target: "/opt/manitto-backend"
+          strip_components: 0
 
       - name: Deploy to NCP Server
         uses: appleboy/ssh-action@v1.0.3
