@@ -30,6 +30,7 @@ class SecurityConfig(
                     .permitAll() // 게스트 모드 초대 코드 참가
                     .requestMatchers("/api/parties/*/guest/join").permitAll() // 게스트 모드 파티 참가
                     // 일반 조회 엔드포인트들
+                    .requestMatchers("/api/parties/stats").permitAll() // 통계 조회
                     .requestMatchers(HttpMethod.GET, "/api/parties/**").permitAll() // 모든 GET 요청 허용
                     .requestMatchers("/api/parties/*/match").permitAll() // 매칭 실행 (POST)
                     .requestMatchers(HttpMethod.DELETE, "/api/parties/*/participants/*")
