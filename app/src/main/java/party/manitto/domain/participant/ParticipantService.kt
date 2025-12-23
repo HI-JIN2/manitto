@@ -4,10 +4,10 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import party.manitto.domain.match.MatchedResultRepository
 import party.manitto.domain.participant.dto.ParticipantResponse
+import party.manitto.domain.party.PartyRepository
 import party.manitto.global.entity.Participant
 import party.manitto.global.entity.Party
 import party.manitto.global.entity.User
-import party.manitto.domain.party.PartyRepository
 
 @Service
 class ParticipantService(
@@ -57,20 +57,24 @@ class ParticipantService(
     }
 
     @Transactional
-    fun joinPartyAsGuest(partyId: Long, name: String, email: String, nickname: String? = null): ParticipantResponse {
+    fun joinPartyAsGuest(partyId: Long, name: String, email: String): ParticipantResponse {
         val party = partyRepository.findById(partyId)
             .orElseThrow { IllegalArgumentException("파티가 존재하지 않습니다.") }
-        return joinPartyAsGuest(party, name, email, nickname)
+        return joinPartyAsGuest(party, name, email)
     }
 
     @Transactional
-    fun joinPartyAsGuestByInviteCode(inviteCode: String, name: String, email: String, nickname: String? = null): ParticipantResponse {
+    fun joinPartyAsGuestByInviteCode(
+        inviteCode: String,
+        name: String,
+        email: String
+    ): ParticipantResponse {
         val party = partyRepository.findByInviteCode(inviteCode)
             ?: throw IllegalArgumentException("유효하지 않은 초대 코드입니다.")
-        return joinPartyAsGuest(party, name, email, nickname)
+        return joinPartyAsGuest(party, name, email)
     }
 
-    private fun joinPartyAsGuest(party: Party, name: String, email: String, nickname: String?): ParticipantResponse {
+    private fun joinPartyAsGuest(party: Party, name: String, email: String): ParticipantResponse {
         // 이미 매칭된 파티에는 참가 불가
         if (matchedResultRepository.existsByParty(party)) {
             throw IllegalArgumentException("이미 매칭이 완료된 파티에는 참가할 수 없습니다.")
@@ -86,11 +90,27 @@ class ParticipantService(
             Participant(
                 user = null,
                 party = party,
-                nickname = nickname,
                 guestName = name,
                 guestEmail = email
             )
         )
         return ParticipantResponse.from(participant)
+    }
+
+    @Transactional
+    fun deleteParticipant(partyId: Long, participantId: Long) {
+        val participant = participantRepository.findById(participantId)
+            .orElseThrow { IllegalArgumentException("참가자를 찾을 수 없습니다.") }
+
+        if (participant.party.id != partyId) {
+            throw IllegalArgumentException("파티 정보가 일치하지 않습니다.")
+        }
+
+        // 매칭 완료된 파티에서는 삭제 불가
+        if (matchedResultRepository.existsByParty(participant.party)) {
+            throw IllegalArgumentException("이미 매칭이 완료된 파티에서는 참가자를 삭제할 수 없습니다.")
+        }
+
+        participantRepository.delete(participant)
     }
 }

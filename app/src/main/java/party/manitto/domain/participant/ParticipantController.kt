@@ -48,7 +48,15 @@ class ParticipantController(
         @PathVariable partyId: Long,
         @RequestBody req: GuestJoinPartyRequest
     ): ParticipantResponse {
-        return participantService.joinPartyAsGuest(partyId, req.name, req.email, req.nickname)
+        return participantService.joinPartyAsGuest(partyId, req.name, req.email)
+    }
+
+    @DeleteMapping("/{partyId}/participants/{participantId}")
+    fun deleteParticipant(
+        @PathVariable partyId: Long,
+        @PathVariable participantId: Long
+    ) {
+        participantService.deleteParticipant(partyId, participantId)
     }
 
     @PostMapping("/invite/{inviteCode}/guest/join")
@@ -56,6 +64,6 @@ class ParticipantController(
         @PathVariable inviteCode: String,
         @RequestBody req: GuestJoinPartyRequest
     ): ParticipantResponse {
-        return participantService.joinPartyAsGuestByInviteCode(inviteCode, req.name, req.email, req.nickname)
+        return participantService.joinPartyAsGuestByInviteCode(inviteCode, req.name, req.email)
     }
 }

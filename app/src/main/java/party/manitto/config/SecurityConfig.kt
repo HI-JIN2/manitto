@@ -32,6 +32,8 @@ class SecurityConfig(
                     // 일반 조회 엔드포인트들
                     .requestMatchers(HttpMethod.GET, "/api/parties/**").permitAll() // 모든 GET 요청 허용
                     .requestMatchers("/api/parties/*/match").permitAll() // 매칭 실행 (POST)
+                    .requestMatchers(HttpMethod.DELETE, "/api/parties/*/participants/*")
+                    .permitAll() // 게스트 모드 참가자 삭제
                     .requestMatchers(
                         "/swagger-ui/**",
                         "/swagger-ui.html",

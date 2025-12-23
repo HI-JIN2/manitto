@@ -1,9 +1,11 @@
 package party.manitto.domain.party
 
-import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import party.manitto.domain.party.dto.*
+import party.manitto.domain.party.dto.CreatePartyRequest
+import party.manitto.domain.party.dto.GuestCreatePartyRequest
+import party.manitto.domain.party.dto.PartyResponse
+import party.manitto.domain.party.dto.PartyStatusResponse
 import party.manitto.global.entity.User
 
 @RestController
@@ -43,6 +45,11 @@ class PartyController(
     // 게스트 모드: 로그인 없이 파티 생성
     @PostMapping("/guest")
     fun createGuestParty(@RequestBody req: GuestCreatePartyRequest): PartyResponse {
-        return partyService.createGuestParty(req.name, req.hostName, req.hostEmail)
+        return partyService.createGuestParty(
+            name = req.name,
+            hostName = req.hostName,
+            hostEmail = req.hostEmail,
+            participants = req.participants
+        )
     }
 }

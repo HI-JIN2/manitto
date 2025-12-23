@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import party.manitto.domain.match.MatchedResultRepository
 import party.manitto.domain.participant.ParticipantRepository
+import party.manitto.domain.party.dto.GuestParticipantRequest
 import party.manitto.domain.party.dto.PartyResponse
 import party.manitto.global.entity.Participant
 import party.manitto.global.entity.Party
@@ -25,11 +26,16 @@ class PartyService(
     }
 
     @Transactional
-    fun createGuestParty(name: String, hostName: String, hostEmail: String): PartyResponse {
+    fun createGuestParty(
+        name: String,
+        hostName: String,
+        hostEmail: String,
+        participants: List<GuestParticipantRequest>? = null
+    ): PartyResponse {
         val inviteCode = generateUniqueInviteCode()
         val newParty = Party(name = name, inviteCode = inviteCode, host = null)
         val saved = partyRepository.save(newParty)
-        
+
         // 게스트 호스트를 첫 번째 참가자로 추가
         val hostParticipant = Participant(
             user = null,
@@ -39,9 +45,28 @@ class PartyService(
             guestEmail = hostEmail
         )
         participantRepository.save(hostParticipant)
-
-        // participants 컬렉션에 직접 추가 (JPA 관계 동기화)
         saved.participants.add(hostParticipant)
+
+        // 추가 게스트 참가자들 자동 참여 (이메일 중복 방지)
+        val seenEmails = mutableSetOf(hostEmail.lowercase())
+        participants
+            .orEmpty()
+            .forEach { guest ->
+                val emailLower = guest.email.lowercase()
+                if (emailLower in seenEmails) {
+                    return@forEach
+                }
+                seenEmails.add(emailLower)
+
+                val participant = Participant(
+                    user = null,
+                    party = saved,
+                    guestName = guest.name,
+                    guestEmail = guest.email
+                )
+                participantRepository.save(participant)
+                saved.participants.add(participant)
+            }
 
         // 저장된 파티를 다시 조회하여 participants 컬렉션을 로드
         val partyWithParticipants = partyRepository.findById(saved.id)
