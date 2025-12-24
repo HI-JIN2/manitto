@@ -24,6 +24,8 @@ logging:
     org.springframework.boot: INFO
     org.flywaydb: INFO  # Flyway 로그 확인
     org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG  # SQL 로그 (DDL 확인용)
+    org.hibernate.tool.schema: DEBUG  # 스키마 생성 로그
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
