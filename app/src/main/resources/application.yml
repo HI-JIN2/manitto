@@ -22,6 +22,11 @@ spring:
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:${DDL_AUTO:validate}}
     show-sql: ${SPRING_JPA_SHOW_SQL:${SHOW_SQL:false}}
+    properties:
+      hibernate:
+        default_schema: ${DB_SCHEMA:root}
+        temp:
+          use_jdbc_metadata_defaults: false
   flyway:
     enabled: ${FLYWAY_ENABLED:true}
     baseline-on-migrate: ${FLYWAY_BASELINE_ON_MIGRATE:true}
@@ -29,6 +34,7 @@ spring:
     locations: classpath:db/migration
     check-location: true
     validate-on-migrate: true
+    schemas: ${DB_SCHEMA:root}
   mail:
     host: ${SPRING_MAIL_HOST:${MAIL_HOST:smtp.gmail.com}}
     port: ${SPRING_MAIL_PORT:${MAIL_PORT:587}}
