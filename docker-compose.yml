@@ -8,6 +8,8 @@ services:
       dockerfile: Dockerfile
     container_name: manitto-backend
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       # Database (NCP Cloud DB)
       SPRING_DATASOURCE_URL: ${DB_URL}

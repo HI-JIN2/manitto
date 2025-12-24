@@ -13,6 +13,7 @@ spring:
       path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+    enabled: true
   datasource:
     url: ${SPRING_DATASOURCE_URL:${DB_URL:jdbc:postgresql://localhost:5432/manitto}}
     username: ${SPRING_DATASOURCE_USERNAME:${DB_USER:postgres}}
@@ -46,5 +47,6 @@ server:
 
 app:
   base-url: ${APP_BASE_URL:}
+  domain: ${APP_DOMAIN:}
   cors:
     allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:}
