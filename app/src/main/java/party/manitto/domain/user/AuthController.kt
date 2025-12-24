@@ -3,11 +3,9 @@ package party.manitto.domain.user
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
-import org.springframework.http.ResponseEntity
+import org.springframework.http.*
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -26,29 +24,65 @@ class AuthController(
     private val restTemplate: RestTemplate,
     @Value("\${google.client-id}") private val googleClientId: String
 ) {
+    private val logger = LoggerFactory.getLogger(AuthController::class.java)
+
     @PostMapping("/google")
     fun googleLogin(@RequestBody req: GoogleAuthRequest): ResponseEntity<AuthResponse> {
-        val credential = req.credential
+        try {
+            val credential = req.credential
 
-        // Google 토큰 검증
-        val payload = GoogleIdTokenVerifier.Builder(NetHttpTransport(), JacksonFactory())
-            .setAudience(listOf(googleClientId)) // ✅ yml 값 사용
-            .build()
-            .verify(credential)
-            ?.payload ?: return ResponseEntity.status(401).build()
+            if (credential.isBlank()) {
+                logger.warn("Google login: Empty credential")
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(AuthResponse(token = "", error = "Google 인증 정보가 없습니다."))
+            }
 
-        val email = payload["email"] as String
-        val name = payload["name"] as? String
-        val picture = payload["picture"] as? String
+            if (googleClientId.isBlank()) {
+                logger.error("Google login: GOOGLE_CLIENT_ID is not set")
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(AuthResponse(token = "", error = "서버 설정 오류가 발생했습니다."))
+            }
 
-        // ✅ 유저 등록 or 조회
-        val user = userRepository.findByEmail(email) 
-            ?: userRepository.save(User(email = email, name = name, picture = picture))
+            logger.debug("Google login: Verifying token with client ID: ${googleClientId.take(20)}...")
 
-        // ✅ 우리 서버용 JWT 발급
-        val token = jwtService.generateToken(user.email)
+            // Google 토큰 검증
+            val verifier = GoogleIdTokenVerifier.Builder(NetHttpTransport(), JacksonFactory())
+                .setAudience(listOf(googleClientId))
+                .build()
 
-        return ResponseEntity.ok(AuthResponse(token = token))
+            val idToken = verifier.verify(credential)
+            if (idToken == null) {
+                logger.warn("Google login: Token verification failed")
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(AuthResponse(token = "", error = "Google 인증 토큰이 유효하지 않습니다."))
+            }
+
+            val payload = idToken.payload
+            val email = payload["email"] as? String
+            val name = payload["name"] as? String
+            val picture = payload["picture"] as? String
+
+            if (email.isNullOrBlank()) {
+                logger.warn("Google login: Email not found in token")
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(AuthResponse(token = "", error = "이메일 정보를 가져올 수 없습니다."))
+            }
+
+            logger.info("Google login: Success for email: $email")
+
+            // ✅ 유저 등록 or 조회
+            val user = userRepository.findByEmail(email)
+                ?: userRepository.save(User(email = email, name = name, picture = picture))
+
+            // ✅ 우리 서버용 JWT 발급
+            val token = jwtService.generateToken(user.email)
+
+            return ResponseEntity.ok(AuthResponse(token = token))
+        } catch (e: Exception) {
+            logger.error("Google login error", e)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(AuthResponse(token = "", error = "로그인 처리 중 오류가 발생했습니다: ${e.message}"))
+        }
     }
 
     @PostMapping("/kakao")
