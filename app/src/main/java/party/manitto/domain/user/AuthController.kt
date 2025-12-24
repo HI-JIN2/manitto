@@ -91,11 +91,25 @@ class AuthController(
         @RequestParam(value = "error", required = false) error: String?
     ): RedirectView {
         try {
+            // state에서 base URL 추출 헬퍼 함수
+            fun extractBaseUrl(stateOrUrl: String?): String {
+                return if (stateOrUrl != null) {
+                    try {
+                        val uri = java.net.URI(stateOrUrl)
+                        "${uri.scheme}://${uri.host}${if (uri.port != -1) ":${uri.port}" else ""}"
+                    } catch (e: Exception) {
+                        getFrontendBaseUrl()
+                    }
+                } else {
+                    getFrontendBaseUrl()
+                }
+            }
+
             if (error != null) {
                 logger.warn("Google OAuth error: $error")
-                val frontendUrl = state ?: getFrontendBaseUrl()
+                val frontendBaseUrl = extractBaseUrl(state)
                 return RedirectView(
-                    "$frontendUrl/auth?error=${
+                    "$frontendBaseUrl/auth?error=${
                         URLEncoder.encode(
                             error,
                             StandardCharsets.UTF_8
@@ -106,14 +120,14 @@ class AuthController(
 
             if (code.isNullOrBlank()) {
                 logger.warn("Google OAuth: No code received")
-                val frontendUrl = state ?: getFrontendBaseUrl()
-                return RedirectView("$frontendUrl/auth?error=no_code")
+                val frontendBaseUrl = extractBaseUrl(state)
+                return RedirectView("$frontendBaseUrl/auth?error=no_code")
             }
 
             if (googleClientId.isBlank() || googleClientSecret.isBlank()) {
                 logger.error("Google login: GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET is not set")
-                val frontendUrl = state ?: getFrontendBaseUrl()
-                return RedirectView("$frontendUrl/auth?error=server_config")
+                val frontendBaseUrl = extractBaseUrl(state)
+                return RedirectView("$frontendBaseUrl/auth?error=server_config")
             }
 
             val backendBase = getBackendBaseUrl().trimEnd('/')
@@ -131,8 +145,8 @@ class AuthController(
                 ).execute()
             } catch (e: Exception) {
                 logger.error("Failed to exchange code for token", e)
-                val frontendUrl = state ?: getFrontendBaseUrl()
-                return RedirectView("$frontendUrl/auth?error=token_exchange_failed")
+                val frontendBaseUrl = extractBaseUrl(state)
+                return RedirectView("$frontendBaseUrl/auth?error=token_exchange_failed")
             }
 
             val accessToken = tokenResponse.accessToken
@@ -150,9 +164,23 @@ class AuthController(
             return RedirectView(redirectUrl)
         } catch (e: Exception) {
             logger.error("Google OAuth callback error", e)
-            val frontendUrl = state ?: getFrontendBaseUrl()
+            // state에서 base URL 추출
+            fun extractBaseUrl(stateOrUrl: String?): String {
+                return if (stateOrUrl != null) {
+                    try {
+                        val uri = java.net.URI(stateOrUrl)
+                        "${uri.scheme}://${uri.host}${if (uri.port != -1) ":${uri.port}" else ""}"
+                    } catch (ex: Exception) {
+                        getFrontendBaseUrl()
+                    }
+                } else {
+                    getFrontendBaseUrl()
+                }
+            }
+
+            val frontendBaseUrl = extractBaseUrl(state)
             return RedirectView(
-                "$frontendUrl/auth?error=${
+                "$frontendBaseUrl/auth?error=${
                     URLEncoder.encode(
                         e.message ?: "unknown",
                         StandardCharsets.UTF_8
