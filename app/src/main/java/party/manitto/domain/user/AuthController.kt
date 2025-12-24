@@ -45,8 +45,9 @@ class AuthController(
             // 프론트엔드 리다이렉트 URI (기본값: /auth/google/redirect)
             val redirectUri = frontendRedirectUri ?: "${getFrontendBaseUrl()}/auth/google/redirect"
 
-            // 백엔드 콜백 URI
-            val backendCallbackUri = "${getBackendBaseUrl()}/api/auth/google/callback"
+            // 백엔드 콜백 URI (슬래시 중복 방지)
+            val backendBase = getBackendBaseUrl().trimEnd('/')
+            val backendCallbackUri = "$backendBase/api/auth/google/callback"
 
             // Google OAuth 인증 URL 생성
             val googleAuthUrl = buildString {
@@ -115,7 +116,8 @@ class AuthController(
                 return RedirectView("$frontendUrl/auth?error=server_config")
             }
 
-            val backendCallbackUri = "${getBackendBaseUrl()}/api/auth/google/callback"
+            val backendBase = getBackendBaseUrl().trimEnd('/')
+            val backendCallbackUri = "$backendBase/api/auth/google/callback"
 
             // code를 access_token으로 교환
             val tokenResponse: GoogleTokenResponse = try {
