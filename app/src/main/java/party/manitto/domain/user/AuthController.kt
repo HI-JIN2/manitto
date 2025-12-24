@@ -30,6 +30,7 @@ class AuthController(
     fun googleLogin(@RequestBody req: GoogleAuthRequest): ResponseEntity<AuthResponse> {
         try {
             val credential = req.credential
+            val redirectUri = req.redirectUri
 
             if (credential.isBlank()) {
                 logger.warn("Google login: Empty credential")
@@ -41,6 +42,16 @@ class AuthController(
                 logger.error("Google login: GOOGLE_CLIENT_ID is not set")
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(AuthResponse(token = "", error = "서버 설정 오류가 발생했습니다."))
+            }
+
+            // redirect_uri 로깅 및 검증 (선택적)
+            if (!redirectUri.isNullOrBlank()) {
+                logger.debug("Google login: Redirect URI: $redirectUri")
+                // 필요시 허용된 redirect URI 목록과 비교
+                // val allowedRedirectUris = listOf("https://manitto-frontend.vercel.app", "http://localhost:3000", ...)
+                // if (!allowedRedirectUris.contains(redirectUri)) {
+                //     logger.warn("Google login: Invalid redirect URI: $redirectUri")
+                // }
             }
 
             logger.debug("Google login: Verifying token with client ID: ${googleClientId.take(20)}...")
