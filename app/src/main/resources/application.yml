@@ -25,8 +25,7 @@ spring:
     properties:
       hibernate:
         default_schema: ${DB_SCHEMA:root}
-        temp:
-          use_jdbc_metadata_defaults: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     enabled: ${FLYWAY_ENABLED:true}
     baseline-on-migrate: ${FLYWAY_BASELINE_ON_MIGRATE:true}
