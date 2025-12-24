@@ -3,6 +3,7 @@ jwt:
 
 google:
   client-id: ${GOOGLE_CLIENT_ID}
+  client-secret: ${GOOGLE_CLIENT_SECRET:}
 
 kakao:
   rest-api-key: ${KAKAO_REST_API_KEY}
@@ -51,6 +52,7 @@ server:
 
 app:
   base-url: ${APP_BASE_URL:}
+  frontend-base-url: ${FRONTEND_BASE_URL:http://localhost:3000}
   domain: ${APP_DOMAIN:}
   cors:
     allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:}
