@@ -69,8 +69,15 @@ jobs:
           script: |
             cd /opt/manitto-backend
             
-            # 환경변수 파일 생성
-            cat > .env << 'EOF'
+            # 환경변수 파일 생성 (기존 파일이 있으면 DDL_AUTO 유지)
+            if [ -f .env ]; then
+              # 기존 .env에서 DDL_AUTO 값 가져오기
+              EXISTING_DDL_AUTO=$(grep "^DDL_AUTO=" .env | cut -d'=' -f2 || echo "update")
+            else
+              EXISTING_DDL_AUTO="update"
+            fi
+            
+            cat > .env << EOF
             DB_URL=${{ secrets.DB_URL }}
             DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
@@ -78,7 +85,7 @@ jobs:
             GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
             MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
             MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
-            DDL_AUTO=validate
+            DDL_AUTO=${EXISTING_DDL_AUTO}
             SHOW_SQL=false
             SPRING_PROFILES_ACTIVE=prod
             EOF

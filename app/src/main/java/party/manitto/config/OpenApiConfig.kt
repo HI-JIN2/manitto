@@ -10,17 +10,22 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class OpenApiConfig {
     @Value("\${app.base-url:}")
-    private lateinit var baseUrl: String
+    private var baseUrl: String = ""
 
     @Bean
     fun customOpenAPI(): OpenAPI {
-        val servers = mutableListOf(
-            Server().url("http://localhost:8080").description("Local")
-        )
+        val servers = mutableListOf<Server>()
 
+        // 프로덕션 URL이 있으면 우선 사용
         if (baseUrl.isNotBlank()) {
-            servers.add(0, Server().url(baseUrl).description("Production"))
+            servers.add(Server().url(baseUrl).description("Production"))
         }
+
+        // 로컬 개발용
+        servers.add(Server().url("http://localhost:8080").description("Local"))
+
+        // 동적 서버 (현재 요청의 호스트 사용)
+        servers.add(Server().url("/").description("Current Server"))
 
         return OpenAPI()
             .info(
