@@ -40,13 +40,13 @@ jobs:
         with:
           context: .
           push: false
-          tags: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+          tags: ${{ env.DOCKER_IMAGE }}:prod
           cache-from: type=gha
           cache-to: type=gha,mode=max
           load: true
 
       - name: Save Docker Image (compressed)
-        run: docker save ${{ env.DOCKER_IMAGE }}:${{ github.sha }} | gzip -1 > image.tar.gz
+        run: docker save ${{ env.DOCKER_IMAGE }}:prod | gzip -1 > image.tar.gz
 
       - name: Copy files to NCP Server
         uses: appleboy/scp-action@v0.1.7
@@ -90,14 +90,8 @@ jobs:
             SPRING_PROFILES_ACTIVE=prod
             EOF
             
-            # Docker 이미지 로드
+            # Docker 이미지 로드 (기존 prod 이미지를 새 이미지로 덮어씀)
             gunzip -c image.tar.gz | docker load
-            
-            # docker-compose.yml에서 빌드 설정을 이미지로 변경
-            sed -i 's|build:|image: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}|g' docker-compose.yml
-            sed -i '/context:/d' docker-compose.yml
-            sed -i '/dockerfile:/d' docker-compose.yml
-            sed -i '/Dockerfile/d' docker-compose.yml
             
             # 기존 컨테이너 정지 및 새 컨테이너 실행
             docker-compose down || true

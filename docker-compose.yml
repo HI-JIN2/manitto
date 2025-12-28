@@ -1,13 +1,10 @@
 version: '3.8'
 
 services:
-  # Spring Boot Backend (NCP RDS 사용)
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  manitto-backend:
+    image: manitto-backend:prod
     container_name: manitto-backend
-    restart: unless-stopped
+    network_mode: host
     env_file:
       - .env
     environment:
@@ -33,6 +30,4 @@ services:
       SERVER_PORT: 8080
       # Spring Profile
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
-    ports:
-      - "8080:8080"
 
