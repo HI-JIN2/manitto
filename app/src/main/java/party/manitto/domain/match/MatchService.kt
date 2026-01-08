@@ -1,13 +1,12 @@
 package party.manitto.domain.match
 
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import party.manitto.domain.match.dto.MatchResultResponse
 import party.manitto.domain.match.dto.MyMatchResponse
 import party.manitto.domain.participant.ParticipantRepository
 import party.manitto.global.entity.MatchedResult
-import party.manitto.global.entity.Participant
 import party.manitto.global.entity.User
-import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import kotlin.random.Random
 
 @Service
@@ -36,12 +35,12 @@ class MatchService(
         val party = participants.firstOrNull()?.party
         val partyName = party?.name
 
-        // 매칭 결과 이메일 발송
+        // 매칭 결과 이메일 발송 (비동기 처리)
         results.forEach {
-            mailService.sendMatchEmail(it.giver.email, it.receiver.displayName, partyName)
+            mailService.sendMatchEmailAsync(it.giver.email, it.receiver.displayName, partyName)
         }
 
-        return MatchResultResponse(message = "매칭 완료 및 이메일 발송 성공!")
+        return MatchResultResponse(message = "매칭 완료 및 이메일 발송 중입니다.")
     }
     
     fun getMyMatch(partyId: Long, user: User): MyMatchResponse {

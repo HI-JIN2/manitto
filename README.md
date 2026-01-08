@@ -85,8 +85,10 @@ SHOW_SQL=false
 SPRING_PROFILES_ACTIVE=prod
 
 # 애플리케이션 설정
-APP_BASE_URL=https://api.your-domain.com
-APP_CORS_ALLOWED_ORIGINS=https://your-frontend.com
+APP_BASE_URL=http://manito-party.online:8080
+FRONTEND_BASE_URL=https://manitto-frontend.vercel.app
+APP_DOMAIN=manito-party.online
+APP_CORS_ALLOWED_ORIGINS=https://manitto-frontend.vercel.app,http://localhost:3000,http://localhost:3002
 ```
 
 ### 환경변수 생성
@@ -132,7 +134,7 @@ docker-compose -f docker-compose.local.yml up -d
 개발 서버 실행 후 브라우저에서 접속:
 
 ```
-http://localhost:8080/swagger-ui.html
+http://localhost:8080/swagger-ui/index.html
 ```
 
 ## 📡 API 엔드포인트
@@ -300,7 +302,7 @@ CREATE INDEX IF NOT EXISTS idx_matched_result_party_id ON matched_result(party_i
 **확인 사항:**
 
 - `SecurityConfig`에서 Swagger 경로가 `permitAll()`로 설정되어 있는지 확인
-- URL: `http://your-server:8080/swagger-ui.html`
+- URL: `http://manito-party.online:8080/swagger-ui/index.html`
 
 ### 이메일 발송 실패
 
