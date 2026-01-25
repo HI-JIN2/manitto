@@ -9,8 +9,7 @@ Spring Boot + Kotlin 기반 마니또(Secret Santa) 서비스 백엔드 API
 - [환경 설정](#-환경-설정)
 - [로컬 개발](#-로컬-개발)
 - [API 엔드포인트](#-api-엔드포인트)
-- [배포](#-배포)
-- [데이터베이스](#-데이터베이스)
+- [배포 (Deployment)](#-배포-deployment)
 - [트러블슈팅](#-트러블슈팅)
 
 ## 🛠 기술 스택
@@ -185,65 +184,12 @@ http://localhost:8080/swagger-ui/index.html
 - 파티 참가: `POST /api/parties/{partyId}/guest/join` 또는
   `POST /api/parties/invite/{inviteCode}/guest/join`
 
-## 🚀 배포
+## 🚀 배포 (Deployment)
 
-### CI/CD 자동 배포 (GitHub Actions)
+GitHub Actions를 통해 CI/CD 파이프라인이 구축되어 있습니다. `master` 브랜치에 푸시하면 자동으로 배포됩니다.
 
-`master` 브랜치에 푸시하면 자동으로 배포됩니다.
-
-**워크플로우 단계:**
-
-1. Gradle 빌드 (캐시 활용)
-2. Docker 이미지 빌드 (BuildKit 캐시)
-3. 이미지 압축 및 서버 전송
-4. 서버에서 컨테이너 재시작
-5. **자동 릴리즈 생성** (Git 태그 + GitHub Release)
-
-**필요한 GitHub Secrets:**
-
-- `NCP_HOST`: NCP 서버 IP
-- `NCP_USERNAME`: SSH 사용자명
-- `NCP_PASSWORD`: SSH 비밀번호
-- `NCP_PORT`: SSH 포트 (기본: 22)
-- `DB_URL`, `DB_USER`, `DB_PASSWORD`: 데이터베이스 정보
-- `JWT_SECRET`: JWT 시크릿 키
-- `GOOGLE_CLIENT_ID`: Google OAuth 클라이언트 ID
-- `MAIL_USERNAME`, `MAIL_PASSWORD`: 이메일 설정
-
-### 수동 배포
-
-```bash
-# 서버에 SSH 접속
-ssh user@your-server
-
-# 프로젝트 디렉토리로 이동
-cd /opt/manitto-backend
-
-# 코드 업데이트
-git pull origin master
-
-# 환경변수 확인
-cat .env
-
-# 컨테이너 재빌드 및 재시작
-docker-compose down
-docker-compose up -d --build
-
-# 로그 확인
-docker logs manitto-backend -f
-```
-
-자세한 배포 가이드는 [DEPLOY.md](./DEPLOY.md)를 참고하세요.
-
-### 자동 릴리즈
-
-배포가 성공적으로 완료되면 자동으로:
-- Git 태그 생성 (`vYYYY.MM.DD.BUILD_NUMBER` 형식)
-- GitHub Release 생성 (릴리즈 노트 포함)
-
-릴리즈 노트는 `CHANGELOG.md`의 `[Unreleased]` 섹션과 커밋 메시지를 기반으로 자동 생성됩니다.
-
-자세한 내용은 [RELEASE.md](./RELEASE.md)를 참고하세요.
+- **상세 배포 가이드**: [docs/DEPLOY.md](docs/DEPLOY.md)
+- **릴리즈 노트 관리**: [docs/RELEASE.md](docs/RELEASE.md)
 
 ## 🗄️ 데이터베이스
 
@@ -280,48 +226,7 @@ docker exec manitto-backend java -jar app.jar --spring.flyway.info
 
 ## 🔍 트러블슈팅
 
-### 애플리케이션이 시작되지 않음
-
-**증상**: `Started ManittoApplicationKt` 로그가 없음
-
-**해결 방법:**
-
-1. 로그 확인: `docker logs manitto-backend --tail 100`
-2. `prod` 프로필 확인: 로그에 `The following 1 profile is active: "prod"` 확인
-3. DB 연결 확인: `HikariPool-1 - Start completed` 확인
-4. Flyway 마이그레이션 확인: `matched_result` 테이블 존재 여부 확인
-
-### 스키마 검증 실패
-
-**에러**: `Schema-validation: missing table [matched_result]`
-
-**해결 방법:**
-
-```sql
--- DB에 직접 접속하여 테이블 생성
-CREATE TABLE IF NOT EXISTS matched_result (
-    id BIGSERIAL PRIMARY KEY,
-    giver_id BIGINT NOT NULL REFERENCES participant(id),
-    receiver_id BIGINT NOT NULL REFERENCES participant(id),
-    party_id BIGINT NOT NULL REFERENCES party(id)
-);
-CREATE INDEX IF NOT EXISTS idx_matched_result_party_id ON matched_result(party_id);
-```
-
-### Swagger UI 접근 불가
-
-**확인 사항:**
-
-- `SecurityConfig`에서 Swagger 경로가 `permitAll()`로 설정되어 있는지 확인
-- URL: `http://manito-party.online:8080/swagger-ui/index.html`
-
-### 이메일 발송 실패
-
-**확인 사항:**
-
-- Gmail 앱 비밀번호 사용 (일반 비밀번호 아님)
-- `MAIL_USERNAME`, `MAIL_PASSWORD` 환경변수 확인
-- SMTP 포트: 587 (TLS)
+자세한 트러블슈팅 가이드는 [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)를 참고하세요.
 
 ## 🛠 유용한 명령어
 
