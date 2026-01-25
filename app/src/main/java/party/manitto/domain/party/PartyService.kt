@@ -36,13 +36,15 @@ class PartyService(
         participants: List<GuestParticipantRequest>? = null
     ): PartyResponse {
         val hostEmailLower = hostEmail.lowercase()
-        val uniqueAdditionalCount = participants
+
+        val uniqueAdditionalGuests = participants
             .orEmpty()
-            .map { it.email.lowercase() }
-            .filter { it != hostEmailLower }
-            .distinct()
-            .size
-        if (1 + uniqueAdditionalCount > Party.MAX_PARTICIPANTS) {
+            .asSequence()
+            .filter { it.email.lowercase() != hostEmailLower }
+            .distinctBy { it.email.lowercase() }
+            .toList()
+
+        if (1 + uniqueAdditionalGuests.size > Party.MAX_PARTICIPANTS) {
             throw CustomException(ErrorCode.PARTY_PARTICIPANT_LIMIT_EXCEEDED)
         }
 
@@ -61,26 +63,17 @@ class PartyService(
         participantRepository.save(hostParticipant)
         saved.participants.add(hostParticipant)
 
-        // 추가 게스트 참가자들 자동 참여 (이메일 중복 방지)
-        val seenEmails = mutableSetOf(hostEmailLower)
-        participants
-            .orEmpty()
-            .forEach { guest ->
-                val emailLower = guest.email.lowercase()
-                if (emailLower in seenEmails) {
-                    return@forEach
-                }
-                seenEmails.add(emailLower)
-
-                val participant = Participant(
-                    user = null,
-                    party = saved,
-                    guestName = guest.name,
-                    guestEmail = guest.email
-                )
-                participantRepository.save(participant)
-                saved.participants.add(participant)
-            }
+        // 추가 게스트 참가자들 자동 참여 (이메일 중복/호스트 이메일 제외)
+        uniqueAdditionalGuests.forEach { guest ->
+            val participant = Participant(
+                user = null,
+                party = saved,
+                guestName = guest.name,
+                guestEmail = guest.email
+            )
+            participantRepository.save(participant)
+            saved.participants.add(participant)
+        }
 
         // 저장된 파티를 다시 조회하여 participants 컬렉션을 로드
         val partyWithParticipants = partyRepository.findById(saved.id)

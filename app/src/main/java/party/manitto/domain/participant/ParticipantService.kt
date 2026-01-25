@@ -17,6 +17,17 @@ class ParticipantService(
     private val partyRepository: PartyRepository,
     private val matchedResultRepository: MatchedResultRepository
 ) {
+    private fun validatePartyIsJoinable(party: Party) {
+        if (matchedResultRepository.existsByParty(party)) {
+            throw CustomException(ErrorCode.ALREADY_MATCHED)
+        }
+
+        val currentCount = participantRepository.countByPartyId(party.id)
+        if (currentCount >= Party.MAX_PARTICIPANTS) {
+            throw CustomException(ErrorCode.PARTY_PARTICIPANT_LIMIT_EXCEEDED)
+        }
+    }
+
     @Transactional
     fun joinPartyById(partyId: Long, user: User, nickname: String? = null): ParticipantResponse {
         val party = partyRepository.findByIdForUpdate(partyId)
@@ -32,15 +43,7 @@ class ParticipantService(
     }
 
     private fun joinParty(party: Party, user: User, nickname: String?): ParticipantResponse {
-        // 이미 매칭된 파티에는 참가 불가
-        if (matchedResultRepository.existsByParty(party)) {
-            throw CustomException(ErrorCode.ALREADY_MATCHED)
-        }
-
-        val currentCount = participantRepository.countByPartyId(party.id)
-        if (currentCount >= Party.MAX_PARTICIPANTS) {
-            throw CustomException(ErrorCode.PARTY_PARTICIPANT_LIMIT_EXCEEDED)
-        }
+        validatePartyIsJoinable(party)
 
         val existing = participantRepository.findByPartyIdAndUser(party.id, user)
         if (existing != null) {
@@ -82,15 +85,7 @@ class ParticipantService(
     }
 
     private fun joinPartyAsGuest(party: Party, name: String, email: String): ParticipantResponse {
-        // 이미 매칭된 파티에는 참가 불가
-        if (matchedResultRepository.existsByParty(party)) {
-            throw CustomException(ErrorCode.ALREADY_MATCHED)
-        }
-
-        val currentCount = participantRepository.countByPartyId(party.id)
-        if (currentCount >= Party.MAX_PARTICIPANTS) {
-            throw CustomException(ErrorCode.PARTY_PARTICIPANT_LIMIT_EXCEEDED)
-        }
+        validatePartyIsJoinable(party)
 
         // 같은 이메일로 이미 참가했는지 확인
         val existing = participantRepository.findByPartyIdAndGuestEmail(party.id, email)
