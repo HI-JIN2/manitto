@@ -33,8 +33,6 @@ class SecurityConfig(
                     .requestMatchers("/api/parties/stats").permitAll() // 통계 조회
                     .requestMatchers(HttpMethod.GET, "/api/parties/**").permitAll() // 모든 GET 요청 허용
                     .requestMatchers("/api/parties/*/match").permitAll() // 매칭 실행 (POST)
-                    .requestMatchers(HttpMethod.DELETE, "/api/parties/*/participants/*")
-                    .permitAll() // 게스트 모드 참가자 삭제
                     .requestMatchers(
                         "/swagger-ui/**",
                         "/swagger-ui.html",
