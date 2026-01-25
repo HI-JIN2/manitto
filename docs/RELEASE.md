@@ -9,25 +9,10 @@
 
 ## 릴리즈 노트 자동 생성
 
-릴리즈 노트는 다음 순서로 생성됩니다:
+릴리즈 노트는 "마지막 태그 이후 커밋 메시지"로만 자동 생성됩니다.
 
-1. **CHANGELOG.md의 [Unreleased] 섹션** (우선순위 높음)
-2. 마지막 태그 이후의 커밋 메시지
-
-### CHANGELOG.md 작성 방법
-
-```markdown
-## [Unreleased]
-
-### Added
-- 새로운 기능 추가
-
-### Changed
-- 변경된 기능
-
-### Fixed
-- 버그 수정
-```
+- 기본 형식: `- <commit subject> (<short sha>)`
+- 병합 커밋은 제외됩니다(`--no-merges`)
 
 ## 버전 형식
 
@@ -47,5 +32,4 @@ git push origin v1.0.0
 
 # GitHub에서 Release 생성
 ```
-
 
