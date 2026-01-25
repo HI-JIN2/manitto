@@ -229,11 +229,11 @@ class AuthController(
 
             logger.info("Google login: Success for email: $email")
 
-            // ✅ 유저 등록 or 조회
+            // 유저 등록 or 조회
             val user = userRepository.findByEmail(email)
                 ?: userRepository.save(User(email = email, name = name, picture = picture))
 
-            // ✅ 우리 서버용 JWT 발급
+            // 우리 서버용 JWT 발급
             val token = jwtService.generateToken(user.email)
 
             return ResponseEntity.ok(AuthResponse(token = token))
@@ -311,11 +311,11 @@ class AuthController(
 
             logger.info("Google login: Success for email: $email")
 
-            // ✅ 유저 등록 or 조회
+            // 유저 등록 or 조회
             val user = userRepository.findByEmail(email)
                 ?: userRepository.save(User(email = email, name = name, picture = picture))
 
-            // ✅ 우리 서버용 JWT 발급
+            // 우리 서버용 JWT 발급
             val token = jwtService.generateToken(user.email)
 
             return ResponseEntity.ok(AuthResponse(token = token))
@@ -355,11 +355,11 @@ class AuthController(
             val name = (properties?.get("nickname") as? String) ?: (kakaoAccount["profile"] as? Map<*, *>)?.get("nickname") as? String
             val picture = (properties?.get("profile_image") as? String) ?: (kakaoAccount["profile"] as? Map<*, *>)?.get("profile_image_url") as? String
 
-            // ✅ 유저 등록 or 조회
+            // 유저 등록 or 조회
             val user = userRepository.findByEmail(email)
                 ?: userRepository.save(User(email = email, name = name, picture = picture))
 
-            // ✅ 우리 서버용 JWT 발급
+            // 우리 서버용 JWT 발급
             val token = jwtService.generateToken(user.email)
 
             return ResponseEntity.ok(AuthResponse(token = token))

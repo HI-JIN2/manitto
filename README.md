@@ -2,6 +2,11 @@
 
 Spring Boot + Kotlin 기반 마니또(Secret Santa) 서비스 백엔드 API
 
+![Kotlin](https://img.shields.io/badge/Kotlin-1.9.23-7F52FF?style=flat&logo=kotlin&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.0-6DB33F?style=flat&logo=springboot&logoColor=white)
+![Build](https://img.shields.io/badge/Build-Gradle-02303A?style=flat&logo=gradle&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-blue?style=flat)
+
 ## 📋 목차
 
 - [기술 스택](#-기술-스택)

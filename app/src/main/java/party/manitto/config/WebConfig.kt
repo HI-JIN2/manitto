@@ -13,9 +13,9 @@ class WebConfig {
     fun corsFilter(): CorsFilter {
         val config = CorsConfiguration()
         config.allowCredentials = true
-        config.addAllowedOriginPattern("http://localhost:*") // ✅ localhost 모든 포트 허용
+        config.addAllowedOriginPattern("http://localhost:*") // localhost 모든 포트 허용
         config.addAllowedHeader("*")
-        config.addAllowedMethod("*") // ✅ GET, POST, OPTIONS, PUT, DELETE 모두 허용
+        config.addAllowedMethod("*") // GET, POST, OPTIONS, PUT, DELETE 모두 허용
 
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", config)

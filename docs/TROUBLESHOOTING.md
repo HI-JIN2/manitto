@@ -33,7 +33,7 @@ CREATE INDEX IF NOT EXISTS idx_matched_result_party_id ON matched_result(party_i
 **확인 사항:**
 
 - `SecurityConfig`에서 Swagger 경로가 `permitAll()`로 설정되어 있는지 확인
-- URL: `http://manito-party.online:8080/swagger-ui/index.html`
+- URL: `http://localhost:8080/swagger-ui/index.html` 또는 `http://<YOUR_SERVER_IP>:8080/swagger-ui/index.html`
 
 ### 이메일 발송 실패
 
