@@ -59,3 +59,6 @@ app:
   email-worker:
     enabled: ${APP_EMAIL_WORKER_ENABLED:false}
     poll-interval-ms: ${APP_EMAIL_WORKER_POLL_INTERVAL_MS:1000}
+    batch-size: ${APP_EMAIL_WORKER_BATCH_SIZE:20}
+    max-attempts: ${APP_EMAIL_WORKER_MAX_ATTEMPTS:5}
+    lock-timeout-minutes: ${APP_EMAIL_WORKER_LOCK_TIMEOUT_MINUTES:10}

@@ -13,14 +13,17 @@ interface EmailJobRepository : JpaRepository<EmailJob, Long> {
             FROM email_job
             WHERE status IN ('PENDING', 'RETRY')
               AND next_run_at <= NOW()
-              AND (locked_at IS NULL OR locked_at < NOW() - INTERVAL '10 minutes')
+              AND (locked_at IS NULL OR locked_at < NOW() - (:lockTimeoutMinutes * INTERVAL '1 minute'))
             ORDER BY id
             LIMIT :limit
             FOR UPDATE SKIP LOCKED
         """,
         nativeQuery = true
     )
-    fun findReadyJobsForUpdate(@Param("limit") limit: Int): List<EmailJob>
+    fun findReadyJobsForUpdate(
+        @Param("limit") limit: Int,
+        @Param("lockTimeoutMinutes") lockTimeoutMinutes: Int
+    ): List<EmailJob>
 
     @Query(
         """
