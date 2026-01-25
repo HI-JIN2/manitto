@@ -1,6 +1,6 @@
 # Manitto Backend
 
-Spring Boot + Kotlin 기반 마니또(Secret Santa) 서비스 백엔드 API
+Spring Boot + Kotlin 기반 마니또 서비스 백엔드 API
 
 ![Kotlin](https://img.shields.io/badge/Kotlin-1.9.23-7F52FF?style=flat&logo=kotlin&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.0-6DB33F?style=flat&logo=springboot&logoColor=white)
