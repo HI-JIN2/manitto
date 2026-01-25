@@ -5,6 +5,8 @@ import org.springframework.transaction.annotation.Transactional
 import party.manitto.domain.match.dto.MatchResultResponse
 import party.manitto.domain.match.dto.MyMatchResponse
 import party.manitto.domain.participant.ParticipantRepository
+import party.manitto.global.entity.EmailJob
+import party.manitto.global.entity.EmailJobStatus
 import party.manitto.global.entity.MatchedResult
 import party.manitto.global.entity.User
 import party.manitto.global.CustomException
@@ -15,7 +17,7 @@ import kotlin.random.Random
 class MatchService(
     private val participantRepository: ParticipantRepository,
     private val matchedResultRepository: MatchedResultRepository,
-    private val mailService: MailService
+    private val emailJobRepository: EmailJobRepository
 ) {
     @Transactional
     fun matchAndSave(partyId: Long): MatchResultResponse {
@@ -33,18 +35,19 @@ class MatchService(
             MatchedResult(giver = giver, receiver = receiver, party = giver.party)
         }
 
-        matchedResultRepository.saveAll(results)
+        val savedResults = matchedResultRepository.saveAll(results)
 
-        // 파티 이름 가져오기
-        val party = participants.firstOrNull()?.party
-        val partyName = party?.name
-
-        // 매칭 결과 이메일 발송 (비동기 처리)
-        results.forEach {
-            mailService.sendMatchEmailAsync(it.giver.email, it.receiver.displayName, partyName)
+        val jobs = savedResults.map {
+            EmailJob(
+                matchedResult = it,
+                party = it.party,
+                toEmail = it.giver.email,
+                status = EmailJobStatus.PENDING
+            )
         }
+        emailJobRepository.saveAll(jobs)
 
-        return MatchResultResponse(message = "매칭 완료 및 이메일 발송 중입니다.")
+        return MatchResultResponse(message = "매칭 완료. 이메일 발송 대기열에 등록했습니다.")
     }
     
     fun getMyMatch(partyId: Long, user: User): MyMatchResponse {
