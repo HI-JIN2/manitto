@@ -30,6 +30,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("io.mockk:mockk:1.13.9")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
     
     // .env 파일 자동 로드
