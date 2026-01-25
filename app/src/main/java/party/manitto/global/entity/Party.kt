@@ -34,6 +34,8 @@ data class Party(
     val participants: MutableList<Participant> = mutableListOf()
 ) {
     companion object {
+        const val MAX_PARTICIPANTS: Int = 30
+
         // 혼동되는 문자 제외 (0,O,o,1,I,i,l,L)
         private val CHARS = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789"
         

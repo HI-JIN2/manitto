@@ -5,6 +5,8 @@ import org.springframework.transaction.annotation.Transactional
 import party.manitto.domain.match.MatchedResultRepository
 import party.manitto.domain.participant.dto.ParticipantResponse
 import party.manitto.domain.party.PartyRepository
+import party.manitto.global.CustomException
+import party.manitto.global.ErrorCode
 import party.manitto.global.entity.Participant
 import party.manitto.global.entity.Party
 import party.manitto.global.entity.User
@@ -17,27 +19,32 @@ class ParticipantService(
 ) {
     @Transactional
     fun joinPartyById(partyId: Long, user: User, nickname: String? = null): ParticipantResponse {
-        val party = partyRepository.findById(partyId)
-            .orElseThrow { IllegalArgumentException("파티가 존재하지 않습니다.") }
+        val party = partyRepository.findByIdForUpdate(partyId)
+            ?: throw CustomException(ErrorCode.PARTY_NOT_FOUND)
         return joinParty(party, user, nickname)
     }
 
     @Transactional
     fun joinPartyByInviteCode(inviteCode: String, user: User, nickname: String? = null): ParticipantResponse {
-        val party = partyRepository.findByInviteCode(inviteCode)
-            ?: throw IllegalArgumentException("유효하지 않은 초대 코드입니다.")
+        val party = partyRepository.findByInviteCodeForUpdate(inviteCode)
+            ?: throw CustomException(ErrorCode.INVALID_INVITE_CODE)
         return joinParty(party, user, nickname)
     }
 
     private fun joinParty(party: Party, user: User, nickname: String?): ParticipantResponse {
         // 이미 매칭된 파티에는 참가 불가
         if (matchedResultRepository.existsByParty(party)) {
-            throw IllegalArgumentException("이미 매칭이 완료된 파티에는 참가할 수 없습니다.")
+            throw CustomException(ErrorCode.ALREADY_MATCHED)
+        }
+
+        val currentCount = participantRepository.countByPartyId(party.id)
+        if (currentCount >= Party.MAX_PARTICIPANTS) {
+            throw CustomException(ErrorCode.PARTY_PARTICIPANT_LIMIT_EXCEEDED)
         }
 
         val existing = participantRepository.findByPartyIdAndUser(party.id, user)
         if (existing != null) {
-            throw IllegalArgumentException("이미 이 파티에 참가한 사용자입니다.")
+            throw CustomException(ErrorCode.ALREADY_JOINED_PARTY)
         }
 
         val participant = participantRepository.save(
@@ -58,8 +65,8 @@ class ParticipantService(
 
     @Transactional
     fun joinPartyAsGuest(partyId: Long, name: String, email: String): ParticipantResponse {
-        val party = partyRepository.findById(partyId)
-            .orElseThrow { IllegalArgumentException("파티가 존재하지 않습니다.") }
+        val party = partyRepository.findByIdForUpdate(partyId)
+            ?: throw CustomException(ErrorCode.PARTY_NOT_FOUND)
         return joinPartyAsGuest(party, name, email)
     }
 
@@ -69,21 +76,26 @@ class ParticipantService(
         name: String,
         email: String
     ): ParticipantResponse {
-        val party = partyRepository.findByInviteCode(inviteCode)
-            ?: throw IllegalArgumentException("유효하지 않은 초대 코드입니다.")
+        val party = partyRepository.findByInviteCodeForUpdate(inviteCode)
+            ?: throw CustomException(ErrorCode.INVALID_INVITE_CODE)
         return joinPartyAsGuest(party, name, email)
     }
 
     private fun joinPartyAsGuest(party: Party, name: String, email: String): ParticipantResponse {
         // 이미 매칭된 파티에는 참가 불가
         if (matchedResultRepository.existsByParty(party)) {
-            throw IllegalArgumentException("이미 매칭이 완료된 파티에는 참가할 수 없습니다.")
+            throw CustomException(ErrorCode.ALREADY_MATCHED)
+        }
+
+        val currentCount = participantRepository.countByPartyId(party.id)
+        if (currentCount >= Party.MAX_PARTICIPANTS) {
+            throw CustomException(ErrorCode.PARTY_PARTICIPANT_LIMIT_EXCEEDED)
         }
 
         // 같은 이메일로 이미 참가했는지 확인
         val existing = participantRepository.findByPartyIdAndGuestEmail(party.id, email)
         if (existing != null) {
-            throw IllegalArgumentException("이미 이 파티에 참가한 이메일입니다.")
+            throw CustomException(ErrorCode.ALREADY_JOINED_EMAIL)
         }
 
         val participant = participantRepository.save(
@@ -100,15 +112,15 @@ class ParticipantService(
     @Transactional
     fun deleteParticipant(partyId: Long, participantId: Long) {
         val participant = participantRepository.findById(participantId)
-            .orElseThrow { IllegalArgumentException("참가자를 찾을 수 없습니다.") }
+            .orElseThrow { CustomException(ErrorCode.PARTICIPANT_NOT_FOUND) }
 
         if (participant.party.id != partyId) {
-            throw IllegalArgumentException("파티 정보가 일치하지 않습니다.")
+            throw CustomException(ErrorCode.PARTICIPANT_PARTY_MISMATCH)
         }
 
         // 매칭 완료된 파티에서는 삭제 불가
         if (matchedResultRepository.existsByParty(participant.party)) {
-            throw IllegalArgumentException("이미 매칭이 완료된 파티에서는 참가자를 삭제할 수 없습니다.")
+            throw CustomException(ErrorCode.ALREADY_MATCHED)
         }
 
         participantRepository.delete(participant)

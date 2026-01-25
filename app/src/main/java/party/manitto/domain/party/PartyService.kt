@@ -35,6 +35,17 @@ class PartyService(
         hostEmail: String,
         participants: List<GuestParticipantRequest>? = null
     ): PartyResponse {
+        val hostEmailLower = hostEmail.lowercase()
+        val uniqueAdditionalCount = participants
+            .orEmpty()
+            .map { it.email.lowercase() }
+            .filter { it != hostEmailLower }
+            .distinct()
+            .size
+        if (1 + uniqueAdditionalCount > Party.MAX_PARTICIPANTS) {
+            throw CustomException(ErrorCode.PARTY_PARTICIPANT_LIMIT_EXCEEDED)
+        }
+
         val inviteCode = generateUniqueInviteCode()
         val newParty = Party(name = name, inviteCode = inviteCode, host = null)
         val saved = partyRepository.save(newParty)
@@ -51,7 +62,7 @@ class PartyService(
         saved.participants.add(hostParticipant)
 
         // 추가 게스트 참가자들 자동 참여 (이메일 중복 방지)
-        val seenEmails = mutableSetOf(hostEmail.lowercase())
+        val seenEmails = mutableSetOf(hostEmailLower)
         participants
             .orEmpty()
             .forEach { guest ->
