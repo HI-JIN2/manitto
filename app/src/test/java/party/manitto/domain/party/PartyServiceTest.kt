@@ -48,7 +48,13 @@ class PartyServiceTest {
         // then
         assertNotNull(response)
         assertEquals("My Party", response.name)
-        verify { partyRepository.save(any()) }
+        
+        // 검증 로직 강화: 저장되는 Party 객체의 속성이 요청값과 일치하는지 확인
+        verify { 
+            partyRepository.save(match { 
+                it.name == "My Party" && it.host == user 
+            }) 
+        }
     }
 
     @Test

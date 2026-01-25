@@ -8,6 +8,7 @@ build/
 *.ipr
 *.iws
 out/
+.vscode/
 
 # Build artifacts
 *.class
