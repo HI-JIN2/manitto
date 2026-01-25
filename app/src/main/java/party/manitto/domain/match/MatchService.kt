@@ -7,6 +7,8 @@ import party.manitto.domain.match.dto.MyMatchResponse
 import party.manitto.domain.participant.ParticipantRepository
 import party.manitto.global.entity.MatchedResult
 import party.manitto.global.entity.User
+import party.manitto.global.CustomException
+import party.manitto.global.ErrorCode
 import kotlin.random.Random
 
 @Service
@@ -18,7 +20,9 @@ class MatchService(
     @Transactional
     fun matchAndSave(partyId: Long): MatchResultResponse {
         val participants = participantRepository.findByPartyId(partyId)
-        require(participants.size > 1) { "참여자가 2명 이상이어야 합니다." }
+        if (participants.size < 2) {
+            throw CustomException(ErrorCode.INVALID_INPUT_VALUE)
+        }
 
         val shuffled = participants.toMutableList()
         do {
@@ -45,10 +49,10 @@ class MatchService(
     
     fun getMyMatch(partyId: Long, user: User): MyMatchResponse {
         val participant = participantRepository.findByPartyIdAndUser(partyId, user)
-            ?: throw IllegalArgumentException("해당 파티에 참가하지 않았습니다.")
+            ?: throw CustomException(ErrorCode.PARTICIPANT_NOT_FOUND)
         
         val matchResult = matchedResultRepository.findByGiver(participant)
-            ?: throw IllegalArgumentException("아직 매칭이 완료되지 않았습니다.")
+            ?: throw CustomException(ErrorCode.RESOURCE_NOT_FOUND)
         
         return MyMatchResponse(receiver = matchResult.receiver.displayName)
     }

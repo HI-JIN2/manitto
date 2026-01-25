@@ -16,3 +16,4 @@ CREATE INDEX idx_email_send_log_party_id ON email_send_log(party_id);
 CREATE INDEX idx_email_send_log_status ON email_send_log(status);
 CREATE INDEX idx_email_send_log_created_at ON email_send_log(created_at);
 
+

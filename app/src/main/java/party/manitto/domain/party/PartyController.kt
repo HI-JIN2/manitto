@@ -2,6 +2,7 @@ package party.manitto.domain.party
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import jakarta.validation.Valid
 import party.manitto.domain.party.dto.*
 import party.manitto.global.entity.User
 
@@ -12,7 +13,7 @@ class PartyController(
 ) {
     @PostMapping
     fun createParty(
-        @RequestBody req: CreatePartyRequest,
+        @Valid @RequestBody req: CreatePartyRequest,
         @AuthenticationPrincipal user: User
     ): PartyResponse {
         return partyService.createParty(req.name, user)
@@ -41,7 +42,7 @@ class PartyController(
 
     // 게스트 모드: 로그인 없이 파티 생성
     @PostMapping("/guest")
-    fun createGuestParty(@RequestBody req: GuestCreatePartyRequest): PartyResponse {
+    fun createGuestParty(@Valid @RequestBody req: GuestCreatePartyRequest): PartyResponse {
         return partyService.createGuestParty(
             name = req.name,
             hostName = req.hostName,

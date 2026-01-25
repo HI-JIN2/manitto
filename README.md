@@ -197,6 +197,7 @@ http://localhost:8080/swagger-ui/index.html
 2. Docker 이미지 빌드 (BuildKit 캐시)
 3. 이미지 압축 및 서버 전송
 4. 서버에서 컨테이너 재시작
+5. **자동 릴리즈 생성** (Git 태그 + GitHub Release)
 
 **필요한 GitHub Secrets:**
 
@@ -233,6 +234,16 @@ docker logs manitto-backend -f
 ```
 
 자세한 배포 가이드는 [DEPLOY.md](./DEPLOY.md)를 참고하세요.
+
+### 자동 릴리즈
+
+배포가 성공적으로 완료되면 자동으로:
+- Git 태그 생성 (`vYYYY.MM.DD.BUILD_NUMBER` 형식)
+- GitHub Release 생성 (릴리즈 노트 포함)
+
+릴리즈 노트는 `CHANGELOG.md`의 `[Unreleased]` 섹션과 커밋 메시지를 기반으로 자동 생성됩니다.
+
+자세한 내용은 [RELEASE.md](./RELEASE.md)를 참고하세요.
 
 ## 🗄️ 데이터베이스
 
