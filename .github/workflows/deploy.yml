@@ -32,6 +32,9 @@ jobs:
         with:
           cache-read-only: false
 
+      - name: Run Tests
+        run: ./gradlew :app:test --no-daemon
+
       - name: Build with Gradle
         run: ./gradlew :app:bootJar --parallel --build-cache --no-daemon
         env:
