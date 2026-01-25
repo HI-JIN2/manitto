@@ -26,7 +26,7 @@ class MatchServiceTest {
     lateinit var matchedResultRepository: MatchedResultRepository
 
     @MockK
-    lateinit var mailService: MailService
+    lateinit var emailJobRepository: EmailJobRepository
 
     @InjectMockKs
     lateinit var matchService: MatchService
@@ -56,16 +56,19 @@ class MatchServiceTest {
         val p2 = Participant(id = 2L, party = party, user = null, guestName = "B", guestEmail = "b@b.com")
         
         every { participantRepository.findByPartyId(partyId) } returns listOf(p1, p2)
-        every { matchedResultRepository.saveAll(any<List<party.manitto.global.entity.MatchedResult>>()) } returns emptyList()
-        every { mailService.sendMatchEmailAsync(any(), any(), any()) } returns Unit
+        every { matchedResultRepository.saveAll(any<List<party.manitto.global.entity.MatchedResult>>()) } answers {
+            invocation.args[0] as List<party.manitto.global.entity.MatchedResult>
+        }
+        every { emailJobRepository.saveAll(any<List<party.manitto.global.entity.EmailJob>>()) } answers {
+            invocation.args[0] as List<party.manitto.global.entity.EmailJob>
+        }
 
         // when
         val response = matchService.matchAndSave(partyId)
 
         // then
-        assertEquals("매칭 완료 및 이메일 발송 중입니다.", response.message)
+        assertEquals("매칭 완료. 이메일 발송 대기열에 등록했습니다.", response.message)
         verify(exactly = 1) { matchedResultRepository.saveAll(any<List<party.manitto.global.entity.MatchedResult>>()) }
-        // 2명에게 이메일 발송
-        verify(exactly = 2) { mailService.sendMatchEmailAsync(any(), any(), any()) }
+        verify(exactly = 1) { emailJobRepository.saveAll(match<List<party.manitto.global.entity.EmailJob>> { it.size == 2 }) }
     }
 }
