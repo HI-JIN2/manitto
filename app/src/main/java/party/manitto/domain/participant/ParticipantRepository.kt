@@ -25,4 +25,6 @@ interface ParticipantRepository : JpaRepository<Participant, Long> {
         @Param("partyId") partyId: Long,
         @Param("email") email: String
     ): Participant?
+
+    fun countByPartyId(partyId: Long): Long
 }

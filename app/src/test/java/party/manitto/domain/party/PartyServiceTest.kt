@@ -12,6 +12,7 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import party.manitto.domain.match.MatchedResultRepository
 import party.manitto.domain.participant.ParticipantRepository
+import party.manitto.domain.party.dto.GuestParticipantRequest
 import party.manitto.global.CustomException
 import party.manitto.global.ErrorCode
 import party.manitto.global.entity.Party
@@ -80,5 +81,29 @@ class PartyServiceTest {
             partyService.getPartyByInviteCode("INVALID")
         }
         assertEquals(ErrorCode.INVALID_INVITE_CODE, exception.errorCode)
+    }
+
+    @Test
+    fun `createGuestParty - 파티 인원 제한(30명) 초과 시 예외 발생`() {
+        // given
+        val hostEmail = "host@test.com"
+        val participants = (1..30).map {
+            GuestParticipantRequest(name = "P$it", email = "p$it@test.com")
+        }
+
+        // when & then
+        val exception = assertThrows<CustomException> {
+            partyService.createGuestParty(
+                name = "Test Party",
+                hostName = "Host",
+                hostEmail = hostEmail,
+                participants = participants
+            )
+        }
+        assertEquals(ErrorCode.PARTY_PARTICIPANT_LIMIT_EXCEEDED, exception.errorCode)
+
+        // 제한 위반이면 DB 작업이 발생하지 않아야 함
+        verify(exactly = 0) { partyRepository.save(any()) }
+        verify(exactly = 0) { participantRepository.save(any()) }
     }
 }
