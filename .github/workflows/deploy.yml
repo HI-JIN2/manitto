@@ -5,6 +5,9 @@ on:
     branches: [master]
   workflow_dispatch:  # 수동 실행 가능
 
+permissions:
+  contents: write
+
 env:
   DOCKER_IMAGE: manitto-backend
 
@@ -28,6 +31,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: false
+
+      - name: Run Tests
+        run: ./gradlew :app:test --no-daemon
 
       - name: Build with Gradle
         run: ./gradlew :app:bootJar --parallel --build-cache --no-daemon

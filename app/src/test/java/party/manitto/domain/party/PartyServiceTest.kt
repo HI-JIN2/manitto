@@ -19,6 +19,7 @@ import party.manitto.global.entity.User
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
+// CI Trigger
 class PartyServiceTest {
 
     @MockK
