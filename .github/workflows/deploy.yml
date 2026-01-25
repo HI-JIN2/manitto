@@ -127,44 +127,20 @@ jobs:
           VERSION=$(date +"%Y.%m.%d")
           BUILD_NUMBER=$(git rev-list --count HEAD 2>/dev/null || echo "0")
           FULL_VERSION="${VERSION}.${BUILD_NUMBER}"
-          
-          # CHANGELOG.md에서 Unreleased 섹션 추출 (있는 경우)
-          if [ -f CHANGELOG.md ]; then
-            CHANGELOG_CONTENT=$(sed -n '/## \[Unreleased\]/,/## \[/p' CHANGELOG.md | sed '/## \[/d' || echo "")
-          else
-            CHANGELOG_CONTENT=""
-          fi
-          
-          # 릴리즈 노트 생성
-          if [ -n "$CHANGELOG_CONTENT" ]; then
-            RELEASE_NOTES=$(cat <<EOF
+
+          # 릴리즈 노트 생성 (커밋 기반)
+          RELEASE_NOTES=$(cat <<EOF
           ## Release ${FULL_VERSION}
-          
-          ${CHANGELOG_CONTENT}
-          
-          ### Commits
-          ${COMMITS}
-          
-          ### Deployment Info
-          - **Deployed at**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-          - **Commit**: ${GITHUB_SHA:0:7}
-          - **Branch**: ${GITHUB_REF#refs/heads/}
-          EOF
-            )
-          else
-            RELEASE_NOTES=$(cat <<EOF
-          ## Release ${FULL_VERSION}
-          
+
           ### Changes
           ${COMMITS}
-          
+
           ### Deployment Info
           - **Deployed at**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
           - **Commit**: ${GITHUB_SHA:0:7}
           - **Branch**: ${GITHUB_REF#refs/heads/}
           EOF
-            )
-          fi
+          )
           
           echo "version=${FULL_VERSION}" >> $GITHUB_OUTPUT
           echo "notes<<EOF" >> $GITHUB_OUTPUT
